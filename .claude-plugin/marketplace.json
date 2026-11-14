@@ -1,7 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-marketplace.json",
   "name": "free-ai-setup",
-  "owner": {"name": "Peer Mohamed"},
+  "owner": {
+    "name": "Peer Mohamed"
+  },
   "description": "Plugins from the free-ai-setup project",
   "plugins": [
     {
@@ -9,7 +11,18 @@
       "source": "./plugins/threejs-video",
       "description": "Brief, scene templates and frame review for animated Three.js explainer videos rendered with Remotion",
       "category": "Design",
-      "keywords": ["three.js", "remotion", "video", "isometric", "explainer"]
+      "keywords": [
+        "three.js",
+        "remotion",
+        "video",
+        "isometric",
+        "explainer"
+      ]
+    },
+    {
+      "name": "build-review",
+      "source": "./plugins/build-review",
+      "description": "Direction reviewer before building, app reviewer before merging."
     }
   ]
 }

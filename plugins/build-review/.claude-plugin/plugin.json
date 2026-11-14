@@ -1,0 +1,8 @@
+{
+  "name": "build-review",
+  "version": "0.1.0",
+  "description": "Two reviewers: one checks the direction of a request before anything is built, one reviews the build before it merges.",
+  "author": {"name": "Peer Mohamed"},
+  "license": "MIT",
+  "keywords": ["review", "planning", "code-review", "agents"]
+}
