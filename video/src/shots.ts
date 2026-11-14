@@ -86,6 +86,15 @@ export const SHOTS = {
     label: 'Kaggle — two Tesla T4',
     light: true,
   },
+  /** The same two lines, cropped tight so they read on a phone. */
+  gpusTight: {
+    file: 'shots/kaggle_2.png',
+    nw: 1363,
+    nh: 849,
+    crop: {x: 140, y: 440, w: 380, h: 78},
+    label: 'Kaggle — two Tesla T4',
+    light: true,
+  },
   /** The notebook's own diagram of the chain. */
   kaggleFlow: {
     file: 'shots/kaggle_4.png',
