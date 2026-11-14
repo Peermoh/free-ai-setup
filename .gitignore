@@ -1,0 +1,8 @@
+# Never commit personal lists, backups, logs or secrets
+ai-models.json
+ai-models.json.*
+backups/
+*.log
+.env
+*.key
+owui-config/

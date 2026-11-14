@@ -1,0 +1,41 @@
+{
+  "combos": {
+    "my-free": [
+      "groq/openai/gpt-oss-120b",
+      "gemini/gemini-3-flash-preview",
+      "nvidia/nvidia/nemotron-3-ultra-550b-a55b",
+      "openrouter/nvidia/nemotron-3.5-lightning:free",
+      "local"
+    ],
+    "my-coding": [
+      "groq/openai/gpt-oss-120b",
+      "openrouter/cohere/north-mini-code:free",
+      "nvidia/poolside/laguna-xs-2.1",
+      "local"
+    ]
+  },
+  "models": [
+    "groq/openai/gpt-oss-120b",
+    "groq/openai/gpt-oss-20b",
+    "gemini/gemini-3-flash-preview",
+    "gemini/gemini-3.1-flash-lite",
+    "nvidia/nvidia/nemotron-3-ultra-550b-a55b",
+    "nvidia/nvidia/nemotron-3.5-lightning-30b-a3b",
+    "nvidia/google/gemma-4-31b-it",
+    "nvidia/poolside/laguna-xs-2.1",
+    "openrouter/cohere/north-mini-code:free",
+    "openrouter/nvidia/nemotron-3.5-lightning:free",
+    "openrouter/nvidia/nemotron-3.5-super-vl:free",
+    "local"
+  ],
+  "settings": {
+    "file_upload": false,
+    "web_search": false,
+    "code_interpreter": false,
+    "memory": false,
+    "builtin_tools": false,
+    "vision_models": [],
+    "image_model": "",
+    "local_context": 0
+  }
+}
