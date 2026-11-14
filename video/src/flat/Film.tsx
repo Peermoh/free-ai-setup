@@ -9,9 +9,9 @@ import {Narration} from './Narration';
 
 /** Scene lengths in seconds: voice delay + clip + about half a second. */
 export const SCENES = [
-  {id: 'hook', s: 4.5}, {id: 'nogpu', s: 4.5}, {id: 'still', s: 6.0}, {id: 'three', s: 2.5},
-  {id: 'local', s: 4.5}, {id: 'tiers', s: 6.0}, {id: 'gpu', s: 4.5}, {id: 'route', s: 5.5},
-  {id: 'chat', s: 4.5}, {id: 'flow', s: 6.8}, {id: 'which', s: 8.1}, {id: 'cta', s: 4.5},
+  {id: 'hook', s: 4.3}, {id: 'nogpu', s: 4.2}, {id: 'still', s: 5.9}, {id: 'three', s: 2.4},
+  {id: 'local', s: 4.5}, {id: 'tiers', s: 5.8}, {id: 'gpu', s: 4.2}, {id: 'route', s: 5.3},
+  {id: 'chat', s: 4.3}, {id: 'flow', s: 6.6}, {id: 'which', s: 8.0}, {id: 'cta', s: 4.4},
 ].map((x) => ({...x, dur: Math.round(x.s * FPS)}));
 
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
