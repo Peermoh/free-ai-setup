@@ -88,7 +88,7 @@ export const Karaoke: React.FC<{
     chunks[chunks.length - 1] = chunks[chunks.length - 1].concat(tail);
   }
 
-  const start = 8;
+  const start = 2;
   const span = Math.max(24, (durationInFrames - start - 6) / chunks.length);
   const index = Math.min(chunks.length - 1, Math.max(0, Math.floor((frame - start) / span)));
   const chunk = chunks[index];
@@ -96,6 +96,9 @@ export const Karaoke: React.FC<{
 
   const isHot = (w: string) =>
     hot.some((h) => w.toLowerCase().replace(/[^a-z0-9-]/g, '') === h.toLowerCase());
+
+  // Nothing at all until the first word lands: an empty box reads as a bug.
+  if (frame < start) return null;
 
   return (
     <div

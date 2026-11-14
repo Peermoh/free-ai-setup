@@ -25,7 +25,7 @@ import {SceneId} from '../config';
  */
 
 /** Spring 0..1 after `delay` frames. */
-const useIn = (delay: number, damping = 16) => {
+const useIn = (delay: number, damping = 13) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   return spring({frame: frame - delay, fps, config: {damping}});
@@ -40,6 +40,11 @@ const useIn = (delay: number, damping = 16) => {
  */
 type Way = 'drop' | 'left' | 'right' | 'grow' | 'spin' | 'rise';
 
+/*
+ * A negative delay starts the spring part-way through, so the first prop of a
+ * scene is already on screen and still moving at frame zero. Starting at zero
+ * leaves the first frame of every scene blank, which reads as a stutter.
+ */
 const Enter: React.FC<{
   delay: number;
   way?: Way;
@@ -77,7 +82,7 @@ const Hook: React.FC = () => {
   return (
     <>
       <IsoFloor drift={f * 0.5} />
-      <Enter delay={2} way="grow">
+      <Enter delay={-7} way="grow">
         <Laptop x={-75} y={-50} />
       </Enter>
       <Enter delay={34} way="drop" amount={220}>
@@ -93,7 +98,7 @@ const NoGpu: React.FC = () => {
   return (
     <>
       <IsoFloor drift={f * 0.5} />
-      <Enter delay={0} way="left" amount={260}>
+      <Enter delay={-7} way="left" amount={260}>
         <Laptop x={-150} y={-80} />
       </Enter>
       <g opacity={ramp(f, 26, 40)}>
@@ -109,7 +114,7 @@ const Still: React.FC = () => {
   return (
     <>
       <IsoFloor drift={f * 0.5} />
-      <Enter delay={0} way="rise">
+      <Enter delay={-7} way="rise">
         <Laptop x={-190} y={-60} />
       </Enter>
       <Enter delay={20}>
@@ -132,7 +137,7 @@ const Three: React.FC = () => {
   return (
     <>
       <IsoFloor drift={f * 0.5} />
-      <Enter delay={6} way="left" amount={300}>
+      <Enter delay={-7} way="left" amount={300}>
         <Laptop x={-230} y={120} />
       </Enter>
       <Enter delay={26} way="rise" amount={200}>
@@ -151,7 +156,7 @@ const Local: React.FC = () => {
   return (
     <>
       <IsoFloor drift={f * 0.5} />
-      <Enter delay={0} way="grow">
+      <Enter delay={-7} way="grow">
         <Laptop x={-150} y={-70} />
       </Enter>
       <Enter delay={30} way="spin">
@@ -177,7 +182,7 @@ const Tiers: React.FC = () => {
     <>
       <IsoFloor drift={f * 0.5} />
       {names.map((n, i) => (
-        <Enter key={n} delay={4 + i * 13} way={i % 2 ? "left" : "right"} amount={240}>
+        <Enter key={n} delay={-7 + i * 11} way={i % 2 ? "left" : "right"} amount={240}>
           <Rack
             x={-180 + i * 95}
             y={180 - i * 95}
@@ -196,7 +201,7 @@ const Gpus: React.FC = () => {
   return (
     <>
       <IsoFloor drift={f * 0.5} />
-      <Enter delay={2} way="left" amount={280}>
+      <Enter delay={-7} way="left" amount={280}>
         <Gpu x={-130} y={-70} spin={f * 1.4} />
       </Enter>
       <Enter delay={24} way="right" amount={280}>
@@ -226,7 +231,7 @@ const Route: React.FC = () => {
       <IsoFloor drift={f * 0.5} />
 
       {/* three sources across the top */}
-      <Enter delay={2} way="left" amount={260}>
+      <Enter delay={-7} way="left" amount={260}>
         <Laptop x={SRC[0].x - 70} y={SRC[0].y - 40} />
       </Enter>
       <Enter delay={14} way="drop" amount={240}>
@@ -275,7 +280,7 @@ const Chat: React.FC = () => {
   return (
     <>
       <IsoFloor drift={f * 0.5} />
-      <Enter delay={0} way="drop" amount={200}>
+      <Enter delay={-7} way="drop" amount={200}>
         <Router x={HUB.x - 65} y={HUB.y - 300} pulse={f} />
       </Enter>
       <IsoRoute
