@@ -18,20 +18,12 @@ import {KaggleTest} from './preview/KaggleTest';
 export const RemotionRoot: React.FC = () => (
   <>
     <Composition
-      id="LinkedInSquare"
+      id="Portrait"
       component={Video}
       durationInFrames={TOTAL_FRAMES}
       fps={FPS}
       width={1080}
-      height={1080}
-    />
-    <Composition
-      id="Landscape"
-      component={Video}
-      durationInFrames={TOTAL_FRAMES}
-      fps={FPS}
-      width={1920}
-      height={1080}
+      height={1920}
     />
     {/* Not part of the film: sample frames for reviewing the look. */}
     <Composition

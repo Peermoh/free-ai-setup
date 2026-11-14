@@ -9,6 +9,17 @@ const MONO = '"JetBrains Mono", monospace';
 const GROTESK = 'Sora, "Space Grotesk", sans-serif';
 const INK = '#eef2fb';
 
+/**
+ * The film is authored in a 1080 square, but the chrome belongs to the frame,
+ * not to the square: in a 9:16 portrait the caption and the corner marks must
+ * sit at the frame's edges, not float in the middle band.
+ */
+const useFrameBox = () => {
+  const {width, height} = useVideoConfig();
+  const su = width / 1080;
+  return {width, height, su, portrait: height > width * 1.2};
+};
+
 /** A label pinned on the scene, arriving with a small pop. */
 export const Chip: React.FC<{
   x: number;
@@ -63,6 +74,7 @@ export const Karaoke: React.FC<{
   size?: number;
 }> = ({text, durationInFrames, hot = [], size = 40}) => {
   const A = useAccent();
+  const {su, portrait} = useFrameBox();
   const frame = useCurrentFrame();
   const words = text.split(' ');
 
@@ -106,7 +118,7 @@ export const Karaoke: React.FC<{
         position: 'absolute',
         left: 0,
         right: 0,
-        bottom: 104,
+        bottom: (portrait ? 360 : 104) * su,
         display: 'flex',
         justifyContent: 'center',
       }}
@@ -116,13 +128,13 @@ export const Karaoke: React.FC<{
           display: 'flex',
           gap: 10,
           alignItems: 'center',
-          maxWidth: 940,
+          maxWidth: 960 * su,
           flexWrap: 'wrap',
           justifyContent: 'center',
           background: 'rgba(8,12,20,.92)',
           border: '1.5px solid rgba(255,255,255,.16)',
-          borderRadius: 12,
-          padding: '14px 20px',
+          borderRadius: 12 * su,
+          padding: `${14 * su}px ${20 * su}px`,
           boxShadow: '0 18px 44px rgba(0,0,0,.6)',
         }}
       >
@@ -138,7 +150,7 @@ export const Karaoke: React.FC<{
               style={{
                 fontFamily: GROTESK,
                 fontWeight: 700,
-                fontSize: size,
+                fontSize: size * su,
                 color: h ? '#140a02' : INK,
                 background: h ? A : 'transparent',
                 borderRadius: 6,
@@ -158,49 +170,62 @@ export const Karaoke: React.FC<{
 
 export const Segments: React.FC<{done: number; total: number}> = ({done, total}) => {
   const A = useAccent();
+  const {su} = useFrameBox();
   return (
-  <div style={{position: 'absolute', right: 34, top: 32, display: 'flex', gap: 5}}>
+  <div
+    style={{position: 'absolute', right: 36 * su, top: 44 * su, display: 'flex', gap: 5 * su}}
+  >
     {Array.from({length: total}).map((_, i) => (
       <div
         key={i}
-        style={{width: 15, height: 13, background: i < done ? A : 'rgba(255,255,255,.18)'}}
+        style={{
+          width: 15 * su,
+          height: 13 * su,
+          background: i < done ? A : 'rgba(255,255,255,.18)',
+        }}
       />
     ))}
   </div>
   );
 };
 
-export const Source: React.FC<{text: string}> = ({text}) => (
-  <div
-    style={{
-      position: 'absolute',
-      left: 34,
-      top: 32,
-      fontFamily: MONO,
-      fontSize: 18,
-      letterSpacing: 2.5,
-      color: 'rgba(238,242,251,.6)',
-    }}
-  >
-    {text}
-  </div>
-);
+export const Source: React.FC<{text: string}> = ({text}) => {
+  const {su} = useFrameBox();
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: 36 * su,
+        top: 42 * su,
+        fontFamily: MONO,
+        fontSize: 18 * su,
+        letterSpacing: 2.5,
+        color: 'rgba(238,242,251,.6)',
+      }}
+    >
+      {text}
+    </div>
+  );
+};
 
-export const Fine: React.FC<{text: string}> = ({text}) => (
-  <div
-    style={{
-      position: 'absolute',
-      left: 34,
-      bottom: 34,
-      fontFamily: MONO,
-      fontSize: 15,
-      letterSpacing: 2,
-      color: 'rgba(238,242,251,.32)',
-    }}
-  >
-    {text}
-  </div>
-);
+export const Fine: React.FC<{text: string}> = ({text}) => {
+  const {su} = useFrameBox();
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: 36 * su,
+        bottom: 44 * su,
+        fontFamily: MONO,
+        fontSize: 15 * su,
+        letterSpacing: 2,
+        color: 'rgba(238,242,251,.32)',
+      }}
+    >
+      {text}
+    </div>
+  );
+};
 
 /** What each scene puts on top of its stage. */
 export type Over = {
@@ -327,6 +352,7 @@ export const OVERLAYS: Record<SceneId, Over> = {
 /** The closing card: a comment box that types the keyword. */
 export const CallToAction: React.FC = () => {
   const A = useAccent();
+  const {su, portrait} = useFrameBox();
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const p = spring({frame: frame - 4, fps, config: {damping: 15}});
@@ -338,7 +364,7 @@ export const CallToAction: React.FC = () => {
         position: 'absolute',
         left: 0,
         right: 0,
-        bottom: 86,
+        bottom: (portrait ? 330 : 86) * su,
         textAlign: 'center',
         opacity: Math.min(1, p * 1.4),
         transform: `translateY(${(1 - p) * 26}px)`,

@@ -1,5 +1,12 @@
 import React from 'react';
-import {AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame} from 'remotion';
+import {
+  AbsoluteFill,
+  Audio,
+  Sequence,
+  staticFile,
+  useCurrentFrame,
+  useVideoConfig,
+} from 'remotion';
 import '@fontsource/jetbrains-mono/500.css';
 import '@fontsource/jetbrains-mono/700.css';
 import '@fontsource/space-grotesk/500.css';
@@ -43,6 +50,13 @@ import {
 
 const Square: React.FC<{children: React.ReactNode}> = ({children}) => {
   const s = useScale();
+  const {width, height} = useVideoConfig();
+  // In portrait the stage rides above centre, leaving the lower third for the
+  // caption and the platform's own interface.
+  const portrait = height > width * 1.2;
+  // Negative lift drops the stage toward the caption: centred left too
+  // large a gap between the artwork and the words.
+  const lift = portrait ? -height * 0.035 : 0;
   return (
     <AbsoluteFill>
       <div
@@ -53,7 +67,7 @@ const Square: React.FC<{children: React.ReactNode}> = ({children}) => {
           width: 1080,
           height: 1080,
           marginLeft: -540,
-          marginTop: -540,
+          marginTop: -540 - lift,
           transform: `scale(${s})`,
         }}
       >
@@ -90,6 +104,8 @@ const musicVolumeAt = (f: number) => {
 const SceneBlock: React.FC<{i: number}> = ({i}) => {
   const scene = SCENES[i];
   const frame = useCurrentFrame();
+  const {width, height} = useVideoConfig();
+  const portrait = height > width * 1.2;
   const Stage = ISO_SCENES[scene.id];
   const over = OVERLAYS[scene.id];
   const dur = scene.dur * FPS;
@@ -121,32 +137,40 @@ const SceneBlock: React.FC<{i: number}> = ({i}) => {
   };
   const v = VIEWS[scene.id] ?? VIEWS.hook;
   const mix = (i: number) => v.a[i] + (v.b[i] - v.a[i]) * e;
-  const cam = {k: mix(0), dx: mix(1) - 540, dy: mix(2) - 470, roll: mix(3)};
+  // Portrait has vertical room to spare, so the artwork is drawn larger.
+  const fill = portrait ? 1.16 : 1;
+  const cam = {k: mix(0) * fill, dx: mix(1) - 540, dy: mix(2) - 470, roll: mix(3)};
 
+  /*
+   * The stage, its chips and its screenshot live in the 1080 square, because
+   * they are positioned against the artwork. The source mark, progress,
+   * caption and fine print belong to the frame itself, so they sit outside
+   * the square and reach the real edges in any aspect ratio.
+   */
   return (
     <AccentCtx.Provider value={over.accent}>
-    <Square>
-      <svg width={1080} height={1080} style={{position: 'absolute', inset: 0}}>
-        <g
-          transform={`translate(${540 + cam.dx} ${470 + cam.dy}) rotate(${cam.roll}) scale(${cam.k})`}
-        >
-          <Stage />
-        </g>
-      </svg>
+      <Square>
+        <svg width={1080} height={1080} style={{position: 'absolute', inset: 0}}>
+          <g
+            transform={`translate(${540 + cam.dx} ${470 + cam.dy}) rotate(${cam.roll}) scale(${cam.k})`}
+          >
+            <Stage />
+          </g>
+        </svg>
+        {over.chips.map((c) => (
+          <Chip key={c.text} {...c} />
+        ))}
+        {over.slide ? <SlideShot {...over.slide} /> : null}
+      </Square>
 
       <Source text={over.source} />
       <Segments done={i + 1} total={SCENES.length} />
-      {over.chips.map((c) => (
-        <Chip key={c.text} {...c} />
-      ))}
       {over.cta ? (
         <CallToAction />
       ) : (
         <Karaoke text={scene.caption} durationInFrames={dur} hot={over.hot} />
       )}
-      {over.slide ? <SlideShot {...over.slide} /> : null}
       <Fine text={over.fine} />
-    </Square>
     </AccentCtx.Provider>
   );
 };

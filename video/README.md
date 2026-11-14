@@ -1,6 +1,6 @@
 # Animated explainer video
 
-An 89-second animated explainer for the `free-ai-setup` project, built with
+A 46-second animated explainer for the `free-ai-setup` project, built with
 [Remotion](https://remotion.dev) (videos as React components).
 
 Made for LinkedIn: it autoplays **muted**, so every word is burned into the
@@ -12,8 +12,7 @@ accessibility.
 ```bash
 npm install
 npm run studio            # preview and scrub in the browser
-npm run render:square     # 1080x1080 -> out/linkedin-square.mp4
-npm run render:landscape  # 1920x1080 -> out/landscape.mp4
+npm run render            # 1080x1920 portrait -> out/portrait.mp4
 npm run captions          # rewrite captions/captions.srt
 npm run voiceover         # regenerate public/vo/*.mp3 from the scene table
 ```

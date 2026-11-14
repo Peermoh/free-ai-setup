@@ -5,10 +5,9 @@
   "description": "Animated LinkedIn explainer for the free-ai-setup project",
   "scripts": {
     "studio": "remotion studio",
-    "render:square": "remotion render LinkedInSquare out/linkedin-square.mp4",
-    "render:landscape": "remotion render Landscape out/landscape.mp4",
     "captions": "node scripts/make-srt.mjs",
-    "voiceover": "bash scripts/make-voiceover.sh"
+    "voiceover": "bash scripts/make-voiceover.sh",
+    "render": "remotion render Portrait out/portrait.mp4"
   },
   "dependencies": {
     "@fontsource/bricolage-grotesque": "^5.3.0",
