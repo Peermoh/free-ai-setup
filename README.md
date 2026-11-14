@@ -26,7 +26,7 @@ Get-ChildItem *.ps1 | Unblock-File
 | `scripts/ai-sync.ps1` | Applies your list of models and combos; switches optional features on or off |
 | `scripts/omniroute-test.ps1` | Tests every model and simulates outages to prove fallback works |
 | `scripts/start-ai.bat` | One-click daily start |
-| `kaggle/kaggle-ollama-fixed-tunnel.ipynb` | Optional: a bigger model on Kaggle's free GPU, at a fixed address, protected by a token |
+| `kaggle/kaggle-ollama-fixed-tunnel.ipynb` | Optional: a bigger model on Kaggle's free GPU, at a fixed address, protected by a token. **Kaggle is cloud:** prompts travel through a tunnel to a cloud machine, so keep personal, company, client and bank data on your laptop model |
 
 Your own list of models lives in `C:\Users\YOU\ai-config\ai-models.json` (with automatic backups), so updating the scripts never overwrites it.
 

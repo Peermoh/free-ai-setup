@@ -1,0 +1,59 @@
+name: PowerShell checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Every script parses (PowerShell 7)
+        shell: pwsh
+        run: |
+          $bad = 0
+          Get-ChildItem scripts -Filter *.ps1 | ForEach-Object {
+            $errs = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$errs)
+            foreach ($e in $errs) { $bad++; Write-Host "::error file=scripts/$($_.Name),line=$($e.Extent.StartLineNumber)::$($e.Message)" }
+          }
+          if ($bad) { exit 1 } else { 'All scripts parse in PowerShell 7' }
+
+      - name: Every script parses (Windows PowerShell 5.1)
+        shell: powershell
+        run: |
+          $bad = 0
+          Get-ChildItem scripts -Filter *.ps1 | ForEach-Object {
+            $errs = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$errs)
+            foreach ($e in $errs) { $bad++; Write-Host "::error file=scripts/$($_.Name),line=$($e.Extent.StartLineNumber)::$($e.Message)" }
+          }
+          if ($bad) { exit 1 } else { 'All scripts parse in Windows PowerShell 5.1' }
+
+      - name: Lint (PSScriptAnalyzer, errors only)
+        shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          $found = Invoke-ScriptAnalyzer -Path scripts -Recurse -Severity Error
+          $found | Format-Table RuleName, ScriptName, Line, Message -AutoSize -Wrap
+          if ($found) { exit 1 } else { 'No lint errors' }
+
+      - name: Project rules (claims, keys, tunnel addresses)
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Recurse -File -Include *.ps1, *.bat, *.md, *.json, *.ipynb |
+            Where-Object { $_.FullName -notmatch '[\\/](video|plugins|node_modules|\.git)[\\/]' }
+          $rules = @(
+            @{ Name = 'banned claim'; Pattern = '(?i)\bunlimited\b|free forever|100% free|\bno limits\b' },
+            @{ Name = 'API key';      Pattern = 'gsk_[A-Za-z0-9]{20,}|AIza[0-9A-Za-z_-]{30,}|nvapi-[A-Za-z0-9_-]{20,}|sk-or-[A-Za-z0-9-]{20,}|sk-[A-Za-z0-9]{32,}' },
+            @{ Name = 'tunnel address'; Pattern = '(?i)\b(?!abc123\b)[a-z0-9-]+\.(ngrok-free\.app|trycloudflare\.com)\b' }
+          )
+          $hits = 0
+          foreach ($r in $rules) {
+            Select-String -Path $files.FullName -Pattern $r.Pattern | ForEach-Object {
+              $hits++; Write-Host "::error file=$($_.Path),line=$($_.LineNumber)::$($r.Name): $($_.Line.Trim())"
+            }
+          }
+          if ($hits) { exit 1 } else { 'No banned claims, keys or tunnel addresses' }
