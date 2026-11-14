@@ -186,10 +186,17 @@ export const build = (
   scene.add(laptop);
 
   // ---- three towers, upper third -----------------------------------------
+  /*
+   * In an isometric projection screen-x is (x - z) * 0.866 and screen-y does
+   * not move when x and z change together. So a flat row across the frame is
+   * (t, -t), and the frame is only ~14.6 world units wide: t beyond about
+   * 2.5 pushes a tower off the edge.
+   */
+  const T = 2.5;
   const towerDefs = [
-    {x: 7.2, z: -7.2, title: 'LOCAL', sub: 'ollama · 3b'},
+    {x: T, z: -T, title: 'LOCAL', sub: 'ollama · 3b'},
     {x: 0, z: 0, title: 'FREE TIERS', sub: 'groq · gemini · nvidia'},
-    {x: -7.2, z: 7.2, title: 'KAGGLE', sub: '2 × t4 gpu'},
+    {x: -T, z: T, title: 'KAGGLE', sub: '2 × t4 gpu'},
   ];
   const towers = towerDefs.map((d) => {
     const g = new THREE.Group();
@@ -199,7 +206,7 @@ export const build = (
     g.position.set(d.x, SERVER_Y, d.z);
 
     const label = new THREE.Mesh(
-      new THREE.PlaneGeometry(6.4, 1.6),
+      new THREE.PlaneGeometry(5.2, 1.3),
       new THREE.MeshBasicMaterial({
         map: labelTexture(d.title, d.sub),
         transparent: true,
@@ -208,7 +215,7 @@ export const build = (
       })
     );
     label.renderOrder = 900;
-    label.position.set(d.x, SERVER_Y + 4.2, d.z);
+    label.position.set(d.x, SERVER_Y + 3.9, d.z);
     scene.add(label);
 
     scene.add(g);
@@ -237,7 +244,7 @@ export const build = (
   scene.add(hub);
 
   const hubLabel = new THREE.Mesh(
-    new THREE.PlaneGeometry(6.4, 1.6),
+    new THREE.PlaneGeometry(5.2, 1.3),
     new THREE.MeshBasicMaterial({
       map: labelTexture('OMNIROUTE', 'open source router'),
       transparent: true,
@@ -246,7 +253,7 @@ export const build = (
     })
   );
   hubLabel.renderOrder = 900;
-  hubLabel.position.set(0, HUB_Y + 3.1, 0);
+  hubLabel.position.set(0, HUB_Y - 2.4, 0);
   scene.add(hubLabel);
 
   // ---- data lines ---------------------------------------------------------
@@ -291,7 +298,7 @@ export const build = (
 
   // ---- closing terminal ---------------------------------------------------
   const terminal = new THREE.Mesh(
-    new THREE.PlaneGeometry(frustum * aspect * 0.92, frustum * aspect * 0.92 * (400 / 1024)),
+    new THREE.PlaneGeometry(frustum * aspect * 0.86, frustum * aspect * 0.86 * (400 / 1024)),
     new THREE.MeshBasicMaterial({
       map: terminalTexture(),
       transparent: true,
@@ -300,7 +307,7 @@ export const build = (
     })
   );
   terminal.renderOrder = 999;
-  terminal.position.set(0, LAPTOP_Y + 2.2, 6);
+  terminal.position.set(0, LAPTOP_Y + 2.4, 0);
   scene.add(terminal);
 
   // ---- timeline, matching the four scenes --------------------------------
@@ -355,13 +362,15 @@ export const build = (
   const tick = (t: number) => {
     // a slow continuous drift, so the schematic feels alive while locked off
     towers.forEach((tw, i) => {
+      // hide entirely until it starts drawing itself in
+      tw.group.visible = tw.group.scale.y > 0.02;
       tw.group.position.y = SERVER_Y + Math.sin(t * 0.7 + i * 1.3) * 0.16;
-      tw.label.position.y = SERVER_Y + 4.2 + Math.sin(t * 0.7 + i * 1.3) * 0.16;
+      tw.label.position.y = SERVER_Y + 3.9 + Math.sin(t * 0.7 + i * 1.3) * 0.16;
     });
     laptop.position.y = LAPTOP_Y + Math.sin(t * 0.6) * 0.14;
     hub.position.y = HUB_Y + Math.sin(t * 0.8 + 1) * 0.12;
     hub.rotation.y = t * 0.22;
-    hubLabel.position.y = HUB_Y + 3.1 + Math.sin(t * 0.8 + 1) * 0.12;
+    hubLabel.position.y = HUB_Y - 2.4 + Math.sin(t * 0.8 + 1) * 0.12;
 
     (hexCore.material as THREE.MeshBasicMaterial).opacity =
       0.3 + (0.5 + Math.sin(t * 3.4) * 0.5) * 0.45 * flow.on;
