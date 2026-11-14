@@ -1,39 +1,39 @@
 1
-00:00:00,000 --> 00:00:07,000
+00:00:00,000 --> 00:00:05,000
 Where can an AI model actually run?
 
 2
-00:00:07,000 --> 00:00:16,000
+00:00:05,000 --> 00:00:12,000
 Three places: someone else's server, your laptop, a borrowed GPU.
 
 3
-00:00:16,000 --> 00:00:25,000
+00:00:12,000 --> 00:00:19,000
 Cloud tiers are fast and free — until the daily limit.
 
 4
-00:00:25,000 --> 00:00:33,000
+00:00:19,000 --> 00:00:24,000
 Your laptop has no limit, but it is slow.
 
 5
-00:00:33,000 --> 00:00:44,000
+00:00:24,000 --> 00:00:32,000
 Kaggle lends you two GPUs, a few hours a week.
 
 6
-00:00:44,000 --> 00:00:55,000
+00:00:32,000 --> 00:00:40,000
 So you do not pick one. You put a router in front.
 
 7
-00:00:55,000 --> 00:01:08,000
+00:00:40,000 --> 00:00:50,000
 It tries them in order. Out of quota? The next one answers.
 
 8
-00:01:08,000 --> 00:01:16,000
+00:00:50,000 --> 00:00:56,000
 Private or work questions skip the cloud entirely.
 
 9
-00:01:16,000 --> 00:01:23,000
+00:00:56,000 --> 00:01:02,000
 None of this is new. Open tools, wired together.
 
 10
-00:01:23,000 --> 00:01:29,000
+00:01:02,000 --> 00:01:07,000
 Scripts and a guide, if you want to take it apart.

@@ -1,12 +1,12 @@
 [
-  {"id": "hook",    "from": 0,  "dur": 7,  "settle": false, "caption": "Where can an AI model actually run?"},
-  {"id": "places",  "from": 7,  "dur": 9,  "settle": false, "caption": "Three places: someone else's server, your laptop, a borrowed GPU."},
-  {"id": "tiers",   "from": 16, "dur": 9,  "settle": true,  "caption": "Cloud tiers are fast and free — until the daily limit."},
-  {"id": "laptop",  "from": 25, "dur": 8,  "settle": false, "caption": "Your laptop has no limit, but it is slow."},
-  {"id": "kaggle",  "from": 33, "dur": 11, "settle": true,  "caption": "Kaggle lends you two GPUs, a few hours a week."},
-  {"id": "router",  "from": 44, "dur": 11, "settle": false, "caption": "So you do not pick one. You put a router in front."},
-  {"id": "order",   "from": 55, "dur": 13, "settle": true,  "caption": "It tries them in order. Out of quota? The next one answers."},
-  {"id": "privacy", "from": 68, "dur": 8,  "settle": false, "caption": "Private or work questions skip the cloud entirely."},
-  {"id": "honest",  "from": 76, "dur": 7,  "settle": true,  "caption": "None of this is new. Open tools, wired together."},
-  {"id": "explore", "from": 83, "dur": 6,  "settle": true,  "caption": "Scripts and a guide, if you want to take it apart."}
+  {"id": "hook",    "from": 0,  "dur": 5, "settle": false, "caption": "Where can an AI model actually run?"},
+  {"id": "places",  "from": 5,  "dur": 7, "settle": false, "caption": "Three places: someone else's server, your laptop, a borrowed GPU."},
+  {"id": "tiers",   "from": 12, "dur": 7, "settle": true,  "caption": "Cloud tiers are fast and free — until the daily limit."},
+  {"id": "laptop",  "from": 19, "dur": 5, "settle": false, "caption": "Your laptop has no limit, but it is slow."},
+  {"id": "kaggle",  "from": 24, "dur": 8, "settle": true,  "caption": "Kaggle lends you two GPUs, a few hours a week."},
+  {"id": "router",  "from": 32, "dur": 8, "settle": false, "caption": "So you do not pick one. You put a router in front."},
+  {"id": "order",   "from": 40, "dur": 10,"settle": true,  "caption": "It tries them in order. Out of quota? The next one answers."},
+  {"id": "privacy", "from": 50, "dur": 6, "settle": false, "caption": "Private or work questions skip the cloud entirely."},
+  {"id": "honest",  "from": 56, "dur": 6, "settle": true,  "caption": "None of this is new. Open tools, wired together."},
+  {"id": "explore", "from": 62, "dur": 5, "settle": true,  "caption": "Scripts and a guide, if you want to take it apart."}
 ]
