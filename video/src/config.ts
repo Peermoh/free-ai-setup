@@ -3,6 +3,7 @@
 // Change a number in this file rather than hunting through the scenes.
 // ---------------------------------------------------------------------------
 
+import {BackdropId} from './design/backdrop';
 import sceneTable from './scenes.json';
 
 /**
@@ -19,6 +20,8 @@ export type Scene = {
   settle: boolean;
   /** How the camera moves across this scene. */
   cam: 'push' | 'pull' | 'panL' | 'panR';
+  /** Which moving background this explanation gets. */
+  bg: BackdropId;
 };
 
 /** Filled in by the owner. Shown in the final scene. */
@@ -50,8 +53,8 @@ export const FONT =
 export const SCENES = sceneTable as readonly Scene[];
 
 export type SceneId =
-  | 'hook' | 'flow' | 'install' | 'keys' | 'local'
-  | 'gpu' | 'order' | 'proof' | 'cta';
+  | 'hook' | 'nogpu' | 'still' | 'three' | 'local'
+  | 'tiers' | 'gpu' | 'route' | 'chat' | 'cta';
 
 /** Total length in seconds: 85 s, inside the 75-90 s target. */
 export const TOTAL_SECONDS = SCENES.reduce((a, s) => Math.max(a, s.from + s.dur), 0);
@@ -124,4 +127,4 @@ export const VOICEOVER_VOLUME = 1;
 export const VOICEOVER_DELAY_SECONDS = 0.4;
 
 /** The ElevenLabs voice used. Change it and re-run `npm run voiceover`. */
-export const VOICEOVER_VOICE = 'Matilda (XrExE9yKIg1WjnnlVkGX)';
+export const VOICEOVER_VOICE = 'Liam (TX3LPaxmHKxFdv7VOQHJ)';

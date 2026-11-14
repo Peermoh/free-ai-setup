@@ -7,7 +7,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-VOICE_ID="${VOICE_ID:-XrExE9yKIg1WjnnlVkGX}"   # Matilda - professional, informative
+VOICE_ID="${VOICE_ID:-TX3LPaxmHKxFdv7VOQHJ}"   # Liam - energetic, social media
 MODEL="${MODEL:-eleven_multilingual_v2}"
 mkdir -p public/vo
 

@@ -1,35 +1,39 @@
 1
-00:00:00,000 --> 00:00:05,000
-Run real AI on your own laptop. For free.
+00:00:00,000 --> 00:00:06,000
+You can build your own AI setup, on the laptop you already have.
 
 2
-00:00:05,000 --> 00:00:14,000
-One chat page. A router. Three places to run a model.
+00:00:06,000 --> 00:00:11,000
+Most of us don't have a powerful machine. No big GPU.
 
 3
-00:00:14,000 --> 00:00:22,000
-Step one: one command installs everything.
+00:00:11,000 --> 00:00:17,000
+This still works. And if you do have a GPU, it gets seriously powerful.
 
 4
-00:00:22,000 --> 00:00:30,000
-Step two: add free providers. The script shows every limit.
+00:00:17,000 --> 00:00:22,000
+It comes down to three things.
 
 5
-00:00:30,000 --> 00:00:37,000
-Step three: a model on your own machine. Nothing leaves it.
+00:00:22,000 --> 00:00:29,000
+One. A model running on your own machine. That's Ollama.
 
 6
-00:00:37,000 --> 00:00:47,000
-Step four: borrow two free GPUs from Kaggle.
+00:00:29,000 --> 00:00:36,000
+Two. Free tiers from Groq, Gemini, NVIDIA and OpenRouter.
 
 7
-00:00:47,000 --> 00:00:57,000
-The router tries them in order. Out of quota? Next one answers.
+00:00:36,000 --> 00:00:43,000
+Three. A free GPU. Kaggle gives you two.
 
 8
-00:00:57,000 --> 00:01:04,000
-Six providers, fifteen models, one chat page.
+00:00:43,000 --> 00:00:49,000
+Now connect them. OmniRoute, an open source router, sits in front.
 
 9
-00:01:04,000 --> 00:01:10,000
-Want the scripts? Tell me in the comments.
+00:00:49,000 --> 00:00:55,000
+And Open WebUI gives you one chat page for all of it.
+
+10
+00:00:55,000 --> 00:01:00,000
+Comment ai-local and I'll share the scripts and the guide.

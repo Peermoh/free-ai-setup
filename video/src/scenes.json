@@ -1,11 +1,92 @@
 [
-  {"id": "hook",    "from": 0,  "dur": 5,  "cam": "push",  "settle": false, "caption": "Run real AI on your own laptop. For free."},
-  {"id": "flow",    "from": 5,  "dur": 9,  "cam": "pull",  "settle": false, "caption": "One chat page. A router. Three places to run a model."},
-  {"id": "install", "from": 14, "dur": 8,  "cam": "push",  "settle": false, "caption": "Step one: one command installs everything."},
-  {"id": "keys",    "from": 22, "dur": 8,  "cam": "panL",  "settle": true,  "caption": "Step two: add free providers. The script shows every limit."},
-  {"id": "local",   "from": 30, "dur": 7,  "cam": "push",  "settle": false, "caption": "Step three: a model on your own machine. Nothing leaves it."},
-  {"id": "gpu",     "from": 37, "dur": 10, "cam": "panR",  "settle": true,  "caption": "Step four: borrow two free GPUs from Kaggle."},
-  {"id": "order",   "from": 47, "dur": 10, "cam": "push",  "settle": true,  "caption": "The router tries them in order. Out of quota? Next one answers."},
-  {"id": "proof",   "from": 57, "dur": 7,  "cam": "pull",  "settle": true,  "caption": "Six providers, fifteen models, one chat page."},
-  {"id": "cta",     "from": 64, "dur": 6,  "cam": "push",  "settle": false, "caption": "Want the scripts? Tell me in the comments."}
+ {
+  "id": "hook",
+  "from": 0,
+  "dur": 6,
+  "cam": "push",
+  "bg": "open",
+  "settle": false,
+  "caption": "You can build your own AI setup, on the laptop you already have."
+ },
+ {
+  "id": "nogpu",
+  "from": 6,
+  "dur": 5,
+  "cam": "panL",
+  "bg": "cool",
+  "settle": false,
+  "caption": "Most of us don't have a powerful machine. No big GPU."
+ },
+ {
+  "id": "still",
+  "from": 11,
+  "dur": 6,
+  "cam": "push",
+  "bg": "surge",
+  "settle": false,
+  "caption": "This still works. And if you do have a GPU, it gets seriously powerful."
+ },
+ {
+  "id": "three",
+  "from": 17,
+  "dur": 5,
+  "cam": "pull",
+  "bg": "three",
+  "settle": false,
+  "caption": "It comes down to three things."
+ },
+ {
+  "id": "local",
+  "from": 22,
+  "dur": 7,
+  "cam": "push",
+  "bg": "local",
+  "settle": false,
+  "caption": "One. A model running on your own machine. That's Ollama."
+ },
+ {
+  "id": "tiers",
+  "from": 29,
+  "dur": 7,
+  "cam": "panR",
+  "bg": "tiers",
+  "settle": true,
+  "caption": "Two. Free tiers from Groq, Gemini, NVIDIA and OpenRouter."
+ },
+ {
+  "id": "gpu",
+  "from": 36,
+  "dur": 7,
+  "cam": "push",
+  "bg": "gpu",
+  "settle": true,
+  "caption": "Three. A free GPU. Kaggle gives you two."
+ },
+ {
+  "id": "route",
+  "from": 43,
+  "dur": 6,
+  "cam": "pull",
+  "bg": "route",
+  "settle": false,
+  "caption": "Now connect them. OmniRoute, an open source router, sits in front."
+ },
+ {
+  "id": "chat",
+  "from": 49,
+  "dur": 6,
+  "cam": "push",
+  "bg": "chat",
+  "settle": true,
+  "caption": "And Open WebUI gives you one chat page for all of it."
+ },
+ {
+  "id": "cta",
+  "from": 55,
+  "dur": 5,
+  "cam": "push",
+  "bg": "cta",
+  "settle": false,
+  "caption": "Comment ai-local and I'll share the scripts and the guide."
+ }
 ]
