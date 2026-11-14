@@ -11,7 +11,7 @@ import {Narration} from './Narration';
 export const SCENES = [
   {id: 'hook', s: 4.5}, {id: 'nogpu', s: 4.5}, {id: 'still', s: 6.0}, {id: 'three', s: 2.5},
   {id: 'local', s: 4.5}, {id: 'tiers', s: 6.0}, {id: 'gpu', s: 4.5}, {id: 'route', s: 5.5},
-  {id: 'chat', s: 4.5}, {id: 'flow', s: 6.8}, {id: 'cta', s: 4.5},
+  {id: 'chat', s: 4.5}, {id: 'flow', s: 6.8}, {id: 'which', s: 8.1}, {id: 'cta', s: 4.5},
 ].map((x) => ({...x, dur: Math.round(x.s * FPS)}));
 
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
@@ -498,6 +498,92 @@ const Flow: React.FC<{dur: number}> = ({dur}) => {
   );
 };
 
+
+/* ---------- 8c · WHICH MODEL? personal data stays local ---------- */
+const Lock: React.FC<{x: number; y: number; s?: number}> = ({x, y, s = 1}) => (
+  <g transform={`translate(${x}, ${y}) scale(${s})`}>
+    <path d="M-16,-6 V-20 A16,16 0 0 1 16,-20 V-6" fill="none" stroke={MINT} strokeWidth={8} />
+    <rect x={-26} y={-8} width={52} height={42} rx={10} fill={MINT} />
+    <circle cy={12} r={6} fill="#0b3d31" />
+  </g>
+);
+const Doc: React.FC<{blink?: boolean}> = ({blink}) => (
+  <g>
+    <rect x={-75} y={-95} width={150} height={190} rx={18} fill="#f4f5ff" />
+    <polygon points="35,-95 75,-55 35,-55" fill="#c3c8e4" />
+    <Face x={0} y={-15} s={0.5} blink={blink} />
+    {[30, 52].map((y) => <rect key={y} x={-48} y={y} width={96} height={10} rx={5} fill="#c3c8e4" />)}
+    <Lock x={58} y={70} s={0.9} />
+  </g>
+);
+const Arrow: React.FC<{x0: number; x1: number; y: number; c: string; draw: number; f: number}> = ({x0, x1, y, c, draw, f}) => {
+  const xe = x0 + (x1 - x0) * draw;
+  return draw > 0 ? (
+    <g>
+      <path d={`M${x0},${y} L${xe},${y}`} stroke={c} strokeWidth={12} strokeDasharray="2 26" strokeLinecap="round" strokeDashoffset={-f * 3} />
+      {draw >= 1 ? <polygon points={`${x1 + 6},${y} ${x1 - 26},${y - 22} ${x1 - 26},${y + 22}`} fill={c} /> : null}
+    </g>
+  ) : null;
+};
+const Which: React.FC<{dur: number}> = ({dur}) => {
+  const f = useCurrentFrame();
+  const out = exit(f, dur);
+  const w = (word: string) => at('which', word);
+  const l1 = bounce(f, w('Keep'), 170, 13);
+  const l2 = bounce(f, w('For') - 4, 170, 13);
+  const doc = pop(f, w('data'), out, 220, 9);
+  const a1 = interpolate(f, [w('machine'), w('machine') + 14], [0, 1], clamp);
+  const cube = pop(f, w('local'), out, 220, 9);
+  const code = pop(f, w('coding'), out, 220, 9);
+  const q = pop(f, w('questions'), out, 220, 9);
+  const a2 = interpolate(f, [w('use'), w('use') + 12], [0, 1], clamp);
+  const cl = pop(f, w('free'), out, 220, 9);
+  const gp = pop(f, w('cloud'), out, 220, 9);
+  return (
+    <AbsoluteFill>
+      <svg width={1080} height={1920}>
+        <g transform={`translate(${(1 - l1) * -1100}, 0)`} opacity={out}>
+          <rect x={60} y={500} width={960} height={370} rx={44} fill={CARD} />
+          <rect x={60} y={500} width={20} height={370} rx={10} fill={MINT} />
+          <text x={120} y={565} fontFamily={FONT} fontWeight={800} fontSize={40} fill={MINT}>PERSONAL DATA</text>
+          {doc.show ? <g transform={`translate(230, 725) scale(${doc.sx}, ${doc.sy})`}><Doc blink={blinking(f, [120])} /></g> : null}
+          <Arrow x0={350} x1={650} y={725} c={MINT} draw={a1} f={f} />
+          {cube.show ? (
+            <g transform={`translate(830, 705) scale(${cube.sx}, ${cube.sy})`}>
+              <Badge kind="cube" />
+              <Lock x={62} y={-58} s={0.8} />
+              <text y={135} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={38} fill={SKY}>LOCAL MODEL</text>
+            </g>
+          ) : null}
+        </g>
+        <g transform={`translate(${(1 - l2) * 1100}, 0)`} opacity={out}>
+          <rect x={60} y={930} width={960} height={370} rx={44} fill={CARD} />
+          <rect x={60} y={930} width={20} height={370} rx={10} fill={SKY} />
+          <text x={120} y={995} fontFamily={FONT} fontWeight={800} fontSize={40} fill={SKY}>GENERAL &amp; CODING</text>
+          {q.show ? (
+            <g transform={`translate(170, 1110) scale(${q.sx}, ${q.sy})`}>
+              <rect x={-60} y={-50} width={120} height={100} rx={34} fill={SUN} />
+              <text y={24} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={64} fill="#000">?</text>
+            </g>
+          ) : null}
+          {code.show ? (
+            <g transform={`translate(300, 1175) scale(${code.sx}, ${code.sy})`}>
+              <rect x={-80} y={-50} width={160} height={100} rx={34} fill={SKY} />
+              <text y={20} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={54} fill="#000">&lt;/&gt;</text>
+            </g>
+          ) : null}
+          <Arrow x0={410} x1={600} y={1145} c={SKY} draw={a2} f={f} />
+          {cl.show ? <g transform={`translate(720, 1135) scale(${0.75 * cl.sx}, ${0.75 * cl.sy})`}><Badge kind="cloud" /></g> : null}
+          {gp.show ? <g transform={`translate(895, 1135) scale(${0.75 * gp.sx}, ${0.75 * gp.sy})`}><Badge kind="gpu" /></g> : null}
+          {cl.show ? <text x={808} y={1255} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={38} fill={CORAL}>FREE CLOUD</text> : null}
+        </g>
+      </svg>
+      <Title frame={f} text="WHICH MODEL?" sub="pick by what you ask" delay={2} out={out} />
+      <Narration id="which" delay={VO_DELAY} />
+    </AbsoluteFill>
+  );
+};
+
 /* ---------- 9 · COMMENT AI-LOCAL ---------- */
 const Cta: React.FC<{dur: number}> = () => {
   const f = useCurrentFrame();
@@ -550,7 +636,7 @@ const Cta: React.FC<{dur: number}> = () => {
 
 const COMPONENTS: Record<string, React.FC<{dur: number}>> = {
   hook: Hook, nogpu: NoGpu, still: Still, three: Three, local: Local,
-  tiers: Tiers, gpu: GpuScene, route: Route, chat: Chat, flow: Flow, cta: Cta,
+  tiers: Tiers, gpu: GpuScene, route: Route, chat: Chat, flow: Flow, which: Which, cta: Cta,
 };
 
 export const FLAT_TOTAL = SCENES.reduce((a, s) => a + s.dur, 0);
