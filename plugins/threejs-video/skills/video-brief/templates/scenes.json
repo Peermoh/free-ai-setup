@@ -1,0 +1,24 @@
+[
+  {
+    "id": "hook",
+    "from": 0,
+    "dur": 4.5,
+    "voice": "You can build your own AI setup, on the laptop you already have.",
+    "text": ["BUILD YOUR OWN AI"],
+    "hero": "laptop",
+    "zone": "bottom",
+    "enter": "grow",
+    "camera": "push"
+  },
+  {
+    "id": "pillars",
+    "from": 4.5,
+    "dur": 6,
+    "voice": "It comes down to three things.",
+    "text": ["THREE THINGS"],
+    "hero": "servers",
+    "zone": "top",
+    "enter": "draw",
+    "camera": "pull"
+  }
+]
