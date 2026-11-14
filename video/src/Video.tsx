@@ -8,6 +8,9 @@ import {
   MUSIC_VOLUME,
   SCENES,
   TOTAL_FRAMES,
+  VOICEOVER,
+  VOICEOVER_DELAY_SECONDS,
+  VOICEOVER_VOLUME,
 } from './config';
 import {Caption} from './components/Caption';
 import {Hook} from './scenes/Hook';
@@ -67,6 +70,18 @@ export const Video: React.FC = () => (
         >
           <Comp />
           <Caption text={scene.caption} />
+          {/*
+            Narration for this scene, a beat after it starts. Nested in its own
+            Sequence so the delay is relative to the scene, not the whole film.
+          */}
+          {VOICEOVER ? (
+            <Sequence from={Math.round(VOICEOVER_DELAY_SECONDS * FPS)}>
+              <Audio
+                src={staticFile(`vo/${scene.id}.mp3`)}
+                volume={VOICEOVER_VOLUME}
+              />
+            </Sequence>
+          ) : null}
         </Sequence>
       );
     })}

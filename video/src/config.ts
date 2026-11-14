@@ -96,3 +96,25 @@ export const MUSIC_VOLUME = 0.18;
 
 /** Seconds of fade-out at the very end, so it does not cut off abruptly. */
 export const MUSIC_FADE_SECONDS = 2;
+
+/**
+ * Narration.
+ *
+ * One clip per scene lives in public/vo/<scene id>.mp3, spoken by ElevenLabs
+ * and regenerated with `npm run voiceover`. The words are exactly the scene
+ * captions, so what is heard and what is read never differ.
+ *
+ * The video must still work in silence: LinkedIn autoplays muted. Narration
+ * is an addition, never the only carrier of meaning. Set this to false to
+ * render silent.
+ */
+export const VOICEOVER = true;
+
+/** Narration volume (0-1). */
+export const VOICEOVER_VOLUME = 1;
+
+/** A short beat after a scene starts before the voice comes in. */
+export const VOICEOVER_DELAY_SECONDS = 0.4;
+
+/** The ElevenLabs voice used. Change it and re-run `npm run voiceover`. */
+export const VOICEOVER_VOICE = 'Matilda (XrExE9yKIg1WjnnlVkGX)';
