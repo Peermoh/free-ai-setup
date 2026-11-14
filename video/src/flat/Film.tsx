@@ -1,18 +1,25 @@
 import React from 'react';
 import {AbsoluteFill, Audio, Sequence, interpolate, staticFile, useCurrentFrame} from 'remotion';
 import {
-  BG, CORAL, FPS, Face, Gpu, Laptop, MINT, SKY, SUN, Shadow, Star, Title,
+  BG, CARD, CORAL, FPS, Face, Gpu, INK, Laptop, MINT, SKY, SOFT, SUN, Shadow, Star, Title, FONT,
   blinking, bob, bounce, exit, squash,
 } from './kit';
+import {Badge, Cloud, Cube, Pill, Router, Terminal, VO_DELAY, Window, at} from './cast';
 import {Narration} from './Narration';
-import WORDS from './words.json';
 
-/** Scene lengths in frames: voice delay + clip + a beat. */
+/** Scene lengths in seconds: voice delay + clip + about half a second. */
 export const SCENES = [
-  {id: 'hook', dur: Math.round(4.5 * FPS)},
-  {id: 'nogpu', dur: Math.round(4.5 * FPS)},
-];
-const VO_DELAY = 8;
+  {id: 'hook', s: 4.5}, {id: 'nogpu', s: 4.5}, {id: 'still', s: 6.0}, {id: 'three', s: 2.5},
+  {id: 'local', s: 4.5}, {id: 'tiers', s: 6.0}, {id: 'gpu', s: 4.5}, {id: 'route', s: 5.5},
+  {id: 'chat', s: 4.5}, {id: 'cta', s: 4.5},
+].map((x) => ({...x, dur: Math.round(x.s * FPS)}));
+
+const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
+const pop = (f: number, d: number, out = 1, st = 200, dm = 10) => {
+  const p = bounce(f, d, st, dm);
+  const q = squash(p);
+  return {p, sx: q.sx * out, sy: q.sy * out, show: f >= d};
+};
 
 /* ---------- 0 · YOUR OWN AI ---------- */
 const Hook: React.FC<{dur: number}> = ({dur}) => {
@@ -57,37 +64,36 @@ const Hook: React.FC<{dur: number}> = ({dur}) => {
     </AbsoluteFill>
   );
 };
-
 /* ---------- 1 · NO BIG GPU ---------- */
 const NoGpu: React.FC<{dur: number}> = ({dur}) => {
   const f = useCurrentFrame();
   const out = exit(f, dur);
-  const lap = bounce(f, 2, 170, 11);
-  const gpu = bounce(f, 14, 180, 9);
-  const STAMP = VO_DELAY + Math.round(WORDS.nogpu.find((w) => w.w === 'No')!.s * FPS); // on the word "No"
+  const g = pop(f, 6, out, 170, 9);
+  const STAMP = at('nogpu', 'No');
   const stamp = bounce(f, STAMP, 260, 13);
   const hit = f >= STAMP + 4;
-  const shake = hit ? Math.sin((f - STAMP) * 2.2) * 22 * Math.max(0, 1 - (f - STAMP) / 18) : 0;
-  const grey = interpolate(f, [STAMP + 4, STAMP + 14], [1, 0.45], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
-  const g = squash(gpu);
-  const lookDown: [number, number] = f > 30 ? [0, 8] : [0, 0];
+  const shake = hit ? Math.sin((f - STAMP) * 2.2) * 26 * Math.max(0, 1 - (f - STAMP) / 18) : 0;
+  const grey = interpolate(f, [STAMP + 4, STAMP + 14], [1, 0.45], clamp);
+  const qs = [{x: 250, y: 620, d: 30}, {x: 830, y: 700, d: 40}, {x: 300, y: 1230, d: 50}];
   return (
     <AbsoluteFill>
       <svg width={1080} height={1920}>
-        <g transform={`translate(540, ${500 + (1 - lap) * -300 + bob(f, 5)}) scale(${0.85 * Math.max(0, lap) * out})`}>
-          <Shadow y={350} w={700} />
-          <Laptop>
-            <Face x={0} y={160} s={1.4} blink={blinking(f, [50])} mood={hit ? 'wow' : 'happy'} look={lookDown} />
-          </Laptop>
-        </g>
-        <g transform={`translate(${540 + shake}, 1110) scale(${1.8 * out}) scale(${g.sx}, ${g.sy}) translate(-120, -110)`}
-          style={{filter: `grayscale(${1 - grey})`}} opacity={grey}>
-          <Gpu spin={hit ? 0 : f * 9} mood={hit ? 'sad' : 'happy'} />
+        {qs.map((q, i) => {
+          const p = bounce(f, q.d, 200, 9);
+          return f >= q.d ? (
+            <text key={i} x={q.x} y={q.y + bob(f, 10, 40, i * 13)} textAnchor="middle" fontFamily={FONT} fontWeight={800}
+              fontSize={90 * Math.max(0, p) * out} fill={[SKY, CORAL, MINT][i]} opacity={hit ? 0.3 : 1}>?</text>
+          ) : null;
+        })}
+        <g transform={`translate(${540 + shake}, ${930 + (g.show ? bob(f, 6) : 0)})`} opacity={grey} style={{filter: `grayscale(${1 - grey})`}}>
+          <g transform={`scale(${2.6 * g.sx}, ${2.6 * g.sy}) translate(-120, -110)`}>
+            <Gpu spin={hit ? 0 : f * 9} mood={hit ? 'sad' : 'happy'} />
+          </g>
         </g>
         {f >= STAMP ? (
-          <g transform={`translate(540, 1110) scale(${0.9 * (2.4 - 1.4 * Math.min(stamp, 1.2)) * out})`} opacity={Math.min(1, stamp * 2)}>
-            <circle cx={0} cy={0} r={230} fill="none" stroke={CORAL} strokeWidth={26} />
-            <line x1={-162} y1={-162} x2={162} y2={162} stroke={CORAL} strokeWidth={26} strokeLinecap="round" />
+          <g transform={`translate(540, 930) scale(${(2.4 - 1.4 * Math.min(stamp, 1.2)) * out})`} opacity={Math.min(1, stamp * 2)}>
+            <circle r={300} fill="none" stroke={CORAL} strokeWidth={30} />
+            <line x1={-212} y1={-212} x2={212} y2={212} stroke={CORAL} strokeWidth={30} strokeLinecap="round" />
           </g>
         ) : null}
       </svg>
@@ -97,7 +103,339 @@ const NoGpu: React.FC<{dur: number}> = ({dur}) => {
   );
 };
 
-const COMPONENTS: Record<string, React.FC<{dur: number}>> = {hook: Hook, nogpu: NoGpu};
+/* ---------- 2 · IT STILL WORKS: a power gauge ---------- */
+const arc = (cx: number, cy: number, r: number, a0: number, a1: number) => {
+  const P = (a: number) => `${cx + r * Math.cos((a * Math.PI) / 180)},${cy - r * Math.sin((a * Math.PI) / 180)}`;
+  return `M${P(a0)} A${r},${r} 0 0 1 ${P(a1)}`;
+};
+const Still: React.FC<{dur: number}> = ({dur}) => {
+  const f = useCurrentFrame();
+  const out = exit(f, dur);
+  const g = pop(f, 4, out, 160, 11);
+  const works = at('still', 'works');
+  const gpuIn = at('still', 'GPU');
+  const boost = at('still', 'seriously');
+  const n1 = bounce(f, works - 6, 120, 8);
+  const n2 = bounce(f, boost - 4, 140, 7);
+  const theta = 172 - 60 * n1 - 98 * n2; // degrees: 180 = left, 0 = right
+  const gp = pop(f, gpuIn, out, 220, 10);
+  const cx = 540, cy = 900;
+  const glow = interpolate(f, [boost, boost + 10], [0, 1], clamp);
+  return (
+    <AbsoluteFill>
+      <svg width={1080} height={1920}>
+        <g transform={`translate(${cx}, ${cy}) scale(${g.sx}, ${g.sy}) translate(${-cx}, ${-cy})`}>
+          <circle cx={cx} cy={cy} r={360} fill={MINT} opacity={0.12 * glow} />
+          <path d={arc(cx, cy, 300, 180, 120)} stroke={SKY} strokeWidth={54} fill="none" strokeLinecap="round" />
+          <path d={arc(cx, cy, 300, 116, 64)} stroke={SUN} strokeWidth={54} fill="none" />
+          <path d={arc(cx, cy, 300, 60, 0)} stroke={MINT} strokeWidth={54} fill="none" strokeLinecap="round" />
+          <text x={cx - 250} y={cy + 70} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={34} fill={SOFT}>OK</text>
+          <text x={cx + 230} y={cy + 70} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={34} fill={glow > 0.5 ? MINT : SOFT}>MAX</text>
+          <g transform={`rotate(${180 - theta} ${cx} ${cy})`}>
+            <polygon points={`${cx - 240},${cy} ${cx},${cy - 18} ${cx},${cy + 18}`} fill={INK} />
+          </g>
+          <circle cx={cx} cy={cy} r={34} fill={INK} />
+          <rect x={cx - 330} y={cy + 100} width={660} height={170} rx={44} fill={CARD} />
+          <Face x={cx} y={cy + 175} s={1.1} blink={blinking(f, [60, 140])} mood={f > boost ? 'wow' : 'happy'} ink={INK} />
+          {f > works ? <text x={cx} y={cy - 70} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={44} fill={f > boost ? MINT : SUN}>{f > boost ? 'POWERFUL' : 'WORKS'}</text> : null}
+        </g>
+        {gp.show ? (
+          <g>
+            <path d={`M540,${cy + 270} L540,1150`} stroke={SUN} strokeWidth={10} strokeDasharray="4 18" strokeLinecap="round" opacity={out} />
+            <g transform={`translate(540, 1230) scale(${gp.sx}, ${gp.sy}) translate(-120, -110)`}><Gpu spin={f * 10} /></g>
+          </g>
+        ) : null}
+        {f > boost ? [0, 1, 2, 3].map((i) => {
+          const p = bounce(f, boost + i * 3, 200, 9);
+          return <Star key={i} x={[230, 860, 180, 900][i]} y={[620, 640, 1000, 980][i]} r={30 * Math.max(0, p) * out} c={[SUN, MINT, SKY, CORAL][i]} rot={f * 2} />;
+        }) : null}
+      </svg>
+      <Title frame={f} text="IT STILL WORKS" sub="and a GPU makes it powerful" delay={2} out={out} />
+      <Narration id="still" delay={VO_DELAY} />
+    </AbsoluteFill>
+  );
+};
+
+/* ---------- 3 · THREE THINGS ---------- */
+const Three: React.FC<{dur: number}> = ({dur}) => {
+  const f = useCurrentFrame();
+  const out = exit(f, dur, 7);
+  const rows = [
+    {c: SKY, n: '1', name: 'LOCAL MODEL', icon: <Cube />},
+    {c: CORAL, n: '2', name: 'FREE TIERS', icon: <Cloud />},
+    {c: SUN, n: '3', name: 'FREE GPU', icon: <Gpu spin={f * 8} />},
+  ];
+  return (
+    <AbsoluteFill>
+      <svg width={1080} height={1920}>
+        {rows.map((r, i) => {
+          const p = bounce(f, 3 + i * 5, 190, 12);
+          const y = 480 + i * 270;
+          const num = bounce(f, at('three', 'three') - 6 + i * 4, 260, 9);
+          return (
+            <g key={r.n} transform={`translate(${(1 - p) * 1100}, 0)`} opacity={out}>
+              <rect x={90} y={y} width={900} height={230} rx={40} fill={CARD} />
+              <rect x={90} y={y} width={20} height={230} rx={10} fill={r.c} />
+              <g transform={`translate(140, ${y + 18}) scale(0.9)`}>{r.icon}</g>
+              <g transform={`translate(470, ${y + 115}) scale(${Math.max(0, num)})`}>
+                <circle r={46} fill={r.c} />
+                <text y={17} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={48} fill="#000">{r.n}</text>
+              </g>
+              <text x={545} y={y + 133} fontFamily={FONT} fontWeight={800} fontSize={50} fill={INK}>{r.name}</text>
+            </g>
+          );
+        })}
+      </svg>
+      <Title frame={f} text="THREE THINGS" delay={0} out={out} />
+      <Narration id="three" delay={VO_DELAY} />
+    </AbsoluteFill>
+  );
+};
+
+/* ---------- 4 · 1 · OLLAMA: the model cube ---------- */
+const Local: React.FC<{dur: number}> = ({dur}) => {
+  const f = useCurrentFrame();
+  const out = exit(f, dur);
+  const drop = at('local', 'One');
+  const p = bounce(f, drop, 150, 8);
+  const {sx, sy} = squash(p);
+  const y = 470 + (1 - Math.min(p, 1)) * -700 + (f > drop + 20 ? bob(f, 8) : 0);
+  return (
+    <AbsoluteFill>
+      <svg width={1080} height={1920}>
+        <circle cx={540} cy={690} r={250} fill={SKY} opacity={0.12 * Math.min(1, Math.max(0, p)) * out} />
+        {f >= drop ? (
+          <g transform={`translate(540, ${y}) scale(${2 * sx * out}, ${2 * sy * out}) translate(-120, 0)`}>
+            <Cube blink={blinking(f, [90])} />
+          </g>
+        ) : null}
+      </svg>
+      <Title frame={f} text="1 · OLLAMA" sub="a model on your machine" delay={2} out={out} />
+      <div style={{opacity: out}}>
+        <Terminal frame={f} start={at('local', 'running')} top={960} lines={['> ollama run llama3.2:3b', 'ready on your machine']} />
+        <Pill text="stays on your laptop" color={MINT} frame={f} at={at('local', 'Ollama')} top={1250} />
+      </div>
+      <Narration id="local" delay={VO_DELAY} />
+    </AbsoluteFill>
+  );
+};
+
+/* ---------- 5 · 2 · FREE TIERS: the cloud ---------- */
+const Tiers: React.FC<{dur: number}> = ({dur}) => {
+  const f = useCurrentFrame();
+  const out = exit(f, dur);
+  const c = pop(f, at('tiers', 'Two'), out, 170, 9);
+  const names = ['Groq', 'Gemini', 'NVIDIA', 'OpenRouter'];
+  const colours = [CORAL, SKY, MINT, SUN];
+  const times = names.map((n) => at('tiers', n));
+  const shown = times.filter((t) => f >= t).length;
+  return (
+    <AbsoluteFill>
+      <svg width={1080} height={1920}>
+        {c.show ? (
+          <g transform={`translate(540, ${610 + bob(f, 6)}) scale(${1.6 * c.sx}, ${1.6 * c.sy}) translate(-130, -120)`}>
+            <Cloud blink={blinking(f, [100])} mood={shown >= 2 ? 'wow' : 'happy'} />
+          </g>
+        ) : null}
+      </svg>
+      <Title frame={f} text="2 · FREE TIERS" sub="hosted models, free to start" delay={2} out={out} />
+      <div style={{position: 'absolute', top: 790, left: 30, right: 30, display: 'flex', justifyContent: 'center', gap: 16, opacity: out}}>
+        {names.map((n, i) => {
+          const p = bounce(f, times[i], 260, 9);
+          return (
+            <div key={n} style={{fontFamily: FONT, fontWeight: 800, fontSize: 34, color: i === 0 ? '#fff' : '#000', background: colours[i],
+              borderRadius: 50, padding: '12px 24px', opacity: f >= times[i] ? 1 : 0,
+              transform: `scale(${Math.max(0, p)}) rotate(${Math.sin(p * 9) * (1 - Math.min(p, 1)) * 30}deg)`}}>{n.toUpperCase()}</div>
+          );
+        })}
+      </div>
+      <div style={{opacity: out}}>
+        <Window frame={f} start={times[0] - 4} id="providerTop" top={930} mark={shown > 0 ? [0.2 + (shown - 1) * 0.2, 0.2] : null} />
+      </div>
+      <Narration id="tiers" delay={VO_DELAY} />
+    </AbsoluteFill>
+  );
+};
+
+/* ---------- 6 · 3 · FREE GPU: a server with two cards ---------- */
+const GpuScene: React.FC<{dur: number}> = ({dur}) => {
+  const f = useCurrentFrame();
+  const out = exit(f, dur);
+  const box = pop(f, 4, out, 170, 11);
+  const in1 = bounce(f, at('gpu', 'GPU') - 4, 150, 12);
+  const in2 = bounce(f, at('gpu', 'two') - 6, 150, 12);
+  const both = f > at('gpu', 'two') + 4;
+  return (
+    <AbsoluteFill>
+      <svg width={1080} height={1920}>
+        <g transform={`translate(540, 480) scale(${box.sx}, ${box.sy})`}>
+          <Shadow y={420} w={560} />
+          <rect x={-280} y={0} width={560} height={400} rx={44} fill={CARD} />
+          <rect x={-280} y={0} width={560} height={22} rx={11} fill={SUN} />
+          <Face x={0} y={100} s={1} blink={blinking(f, [70])} mood={both ? 'wow' : 'happy'} ink={INK} />
+          <rect x={-250} y={190} width={240} height={140} rx={20} fill="#0b0b0e" />
+          <rect x={10} y={190} width={240} height={140} rx={20} fill="#0b0b0e" />
+          {f >= at('gpu', 'GPU') - 4 ? <g transform={`translate(${-250 + (1 - in1) * -700}, 133)`}><Gpu spin={f * 10} /></g> : null}
+          {f >= at('gpu', 'two') - 6 ? <g transform={`translate(${10 + (1 - in2) * 700}, 133)`}><Gpu spin={f * 10} /></g> : null}
+        </g>
+      </svg>
+      <Title frame={f} text="3 · FREE GPU" sub="kaggle gives you two" delay={2} out={out} />
+      <div style={{opacity: out}}>
+        <Pill text="2 × Tesla T4" color={SUN} frame={f} at={at('gpu', 'two') + 2} top={925} />
+        <Window frame={f} start={at('gpu', 'Kaggle')} id="gpusTight" top={1040} title="nvidia-smi on kaggle" />
+      </div>
+      <Narration id="gpu" delay={VO_DELAY} />
+    </AbsoluteFill>
+  );
+};
+
+/* ---------- 7 · OMNIROUTE ---------- */
+const Route: React.FC<{dur: number}> = ({dur}) => {
+  const f = useCurrentFrame();
+  const out = exit(f, dur);
+  const srcAt = at('route', 'connect');
+  const rAt = at('route', 'OmniRoute') - 4;
+  const r = pop(f, rAt, out, 170, 9);
+  const xs = [270, 540, 810];
+  const kinds = ['cube', 'cloud', 'gpu'] as const;
+  const cols = [SKY, CORAL, SUN];
+  const flow = Math.max(0, f - rAt - 10);
+  return (
+    <AbsoluteFill>
+      <svg width={1080} height={1920}>
+        {xs.map((x, i) => {
+          const draw = interpolate(f, [rAt + 6 + i * 3, rAt + 20 + i * 3], [0, 1], clamp);
+          const d = `M${x},660 C${x},760 ${540 + (x - 540) * 0.2},760 ${540 + (x - 540) * 0.2},820`;
+          return (
+            <g key={i} opacity={out}>
+              <path d={d} stroke={cols[i]} strokeWidth={10} fill="none" strokeLinecap="round" pathLength={1} strokeDasharray={`${draw} 1`} opacity={0.35} />
+              {draw >= 1 ? <path d={d} stroke={cols[i]} strokeWidth={12} fill="none" strokeLinecap="round" strokeDasharray="2 30" strokeDashoffset={-flow * 3} /> : null}
+            </g>
+          );
+        })}
+        {xs.map((x, i) => {
+          const p = pop(f, srcAt + i * 4, out, 220, 10);
+          return p.show ? <g key={i} transform={`translate(${x}, ${560 + bob(f, 5, 40, i * 9)}) scale(${0.95 * p.sx}, ${0.95 * p.sy})`}><Badge kind={kinds[i]} /></g> : null;
+        })}
+        {r.show ? (
+          <g transform={`translate(540, 880) scale(${1.4 * r.sx}, ${1.4 * r.sy})`}>
+            <Router blink={blinking(f, [110])} lights={f / 6} />
+          </g>
+        ) : null}
+      </svg>
+      <Title frame={f} text="OMNIROUTE" sub="an open source router" delay={2} out={out} />
+      <div style={{opacity: out}}>
+        <Pill text="picks a free model" color={MINT} frame={f} at={at('route', 'router')} top={1120} />
+        <Pill text="falls back if one is busy" color={SKY} frame={f} at={at('route', 'front')} top={1230} />
+      </div>
+      <Narration id="route" delay={VO_DELAY} />
+    </AbsoluteFill>
+  );
+};
+
+/* ---------- 8 · ONE CHAT PAGE: a chat window ---------- */
+const Chat: React.FC<{dur: number}> = ({dur}) => {
+  const f = useCurrentFrame();
+  const out = exit(f, dur);
+  const w = pop(f, 3, out, 160, 12);
+  const b1 = bounce(f, at('chat', 'gives'), 240, 11);
+  const b2 = bounce(f, at('chat', 'one'), 200, 12);
+  const b3 = bounce(f, at('chat', 'all'), 240, 11);
+  const grow = interpolate(f, [at('chat', 'one'), at('chat', 'one') + 30], [0, 1], clamp);
+  return (
+    <AbsoluteFill>
+      <svg width={1080} height={1920}>
+        <g transform={`translate(540, 830) scale(${w.sx}, ${w.sy}) translate(-430, -380)`}>
+          <rect x={0} y={0} width={860} height={760} rx={44} fill="#f4f5ff" />
+          <rect x={0} y={0} width={860} height={110} rx={44} fill="#2a2a31" />
+          <rect x={0} y={70} width={860} height={40} fill="#2a2a31" />
+          <circle cx={70} cy={55} r={34} fill={MINT} />
+          <Face x={70} y={52} s={0.36} blink={blinking(f, [80])} ink="#0b3d31" />
+          <text x={124} y={68} fontFamily={FONT} fontWeight={800} fontSize={36} fill={INK}>MY-FREE</text>
+          <text x={300} y={66} fontFamily={FONT} fontWeight={800} fontSize={30} fill={SOFT}>▾</text>
+          {f >= at('chat', 'gives') ? (
+            <g transform={`translate(800, 210) scale(${Math.max(0, b1)}) translate(-800, -210)`}>
+              <rect x={420} y={160} width={380} height={96} rx={48} fill={SKY} />
+              <rect x={460} y={200} width={290} height={16} rx={8} fill="#fff" />
+            </g>
+          ) : null}
+          {f >= at('chat', 'one') ? (
+            <g transform={`translate(60, 300) scale(${Math.max(0, b2)}) translate(-60, -300)`}>
+              <rect x={60} y={290} width={560} height={250} rx={40} fill="#fff" stroke="#dfe3f5" strokeWidth={4} />
+              {[440, 380, 470, 260].map((wd, i) => (
+                <rect key={i} x={100} y={330 + i * 44} width={wd * Math.min(1, Math.max(0, grow * 4 - i))} height={18} rx={9} fill="#c3c8e4" />
+              ))}
+              {[SKY, CORAL, SUN].map((c, i) => <circle key={c} cx={110 + i * 40} cy={515} r={13} fill={c} />)}
+            </g>
+          ) : null}
+          {f >= at('chat', 'all') ? (
+            <g transform={`translate(800, 620) scale(${Math.max(0, b3)}) translate(-800, -620)`}>
+              <rect x={500} y={580} width={300} height={90} rx={45} fill={CORAL} />
+              <rect x={540} y={617} width={200} height={16} rx={8} fill="#fff" />
+            </g>
+          ) : null}
+        </g>
+      </svg>
+      <Title frame={f} text="ONE CHAT PAGE" sub="open webui, for all of it" delay={2} out={out} />
+      <Narration id="chat" delay={VO_DELAY} />
+    </AbsoluteFill>
+  );
+};
+
+/* ---------- 9 · COMMENT AI-LOCAL ---------- */
+const Cta: React.FC<{dur: number}> = () => {
+  const f = useCurrentFrame();
+  const bub = pop(f, at('cta', 'Comment') - 2, 1, 150, 14);
+  const xs = [300, 540, 780];
+  const kinds = ['cube', 'cloud', 'gpu'] as const;
+  return (
+    <AbsoluteFill>
+      <svg width={1080} height={1920}>
+        {xs.map((x, i) => {
+          const p = pop(f, 2 + i * 3, 1, 220, 11);
+          return (
+            <g key={i}>
+              <path d={`M${x},700 L540,790`} stroke={[SKY, CORAL, SUN][i]} strokeWidth={8} strokeDasharray="2 22" strokeLinecap="round" strokeDashoffset={-f * 3} />
+              <g transform={`translate(${x}, ${640 + bob(f, 4, 40, i * 7)}) scale(${0.6 * p.sx}, ${0.6 * p.sy})`}><Badge kind={kinds[i]} /></g>
+            </g>
+          );
+        })}
+        <g transform={`translate(540, 820) scale(${0.6 * Math.max(0, bounce(f, 10, 220, 11))})`}><Router lights={f / 6} /></g>
+        <g transform={`translate(540, ${1080}) scale(${bub.sx}, ${bub.sy})`}>
+          <rect x={-400} y={-130} width={800} height={260} rx={70} fill={CORAL} />
+          <polygon points="-260,120 -170,120 -290,210" fill={CORAL} />
+        </g>
+        {[0, 1, 2, 3, 4].map((i) => {
+          const t = (f - 40 - i * 14) / 50;
+          if (t < 0 || t > 1) return null;
+          const x = [110, 970, 170, 920, 60][i];
+          const y = 1260 - t * 420;
+          return (
+            <path key={i} transform={`translate(${x}, ${y}) scale(${1.6 + 0.4 * Math.sin(f / 5 + i)}) rotate(${Math.sin(f / 9 + i) * 12})`} opacity={1 - t}
+              d="M0,8 C-14,-6 -22,6 -12,16 L0,26 L12,16 C22,6 14,-6 0,8 Z" fill={[CORAL, '#ff8fb1', CORAL, '#ff8fb1', CORAL][i]} />
+          );
+        })}
+      </svg>
+      <Title frame={f} text="WANT THE SCRIPTS?" sub="and the full guide" delay={2} />
+      {bub.show ? (
+        <div style={{position: 'absolute', top: 975, left: 140, width: 800, textAlign: 'center', fontFamily: FONT, color: '#fff'}}>
+          <div style={{fontWeight: 600, fontSize: 44, letterSpacing: 3}}>COMMENT</div>
+          <div style={{fontWeight: 800, fontSize: 104, lineHeight: 1.1}}>
+            {'AI-LOCAL'.split('').map((ch, i) => (
+              <span key={i} style={{display: 'inline-block', transform: `translateY(${Math.sin((f - i * 4) / 6) * 10}px)`}}>{ch}</span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      <Narration id="cta" delay={VO_DELAY} />
+    </AbsoluteFill>
+  );
+};
+
+const COMPONENTS: Record<string, React.FC<{dur: number}>> = {
+  hook: Hook, nogpu: NoGpu, still: Still, three: Three, local: Local,
+  tiers: Tiers, gpu: GpuScene, route: Route, chat: Chat, cta: Cta,
+};
 
 export const FLAT_TOTAL = SCENES.reduce((a, s) => a + s.dur, 0);
 
@@ -105,7 +443,7 @@ export const FlatFilm: React.FC = () => {
   let from = 0;
   return (
     <AbsoluteFill style={{background: BG}}>
-      <Audio src={staticFile('music.mp3')} volume={(f) => interpolate(f, [0, 10, FLAT_TOTAL - 20, FLAT_TOTAL], [0, 0.22, 0.22, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})} />
+      <Audio src={staticFile('music.mp3')} volume={(f) => interpolate(f, [0, 10, FLAT_TOTAL - 30, FLAT_TOTAL], [0, 0.22, 0.22, 0], clamp)} />
       {SCENES.map((s) => {
         const C = COMPONENTS[s.id];
         const el = (

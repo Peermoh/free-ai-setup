@@ -123,7 +123,7 @@ export const Title: React.FC<{frame: number; text: string; sub?: string; delay?:
   const ps = bounce(frame, subDelay, 200, 12);
   return (
     <div style={{position: 'absolute', top: 220, left: 40, right: 40, textAlign: 'center', opacity: out, transform: `scale(${0.85 + 0.15 * out})`}}>
-      <div style={{fontFamily: FONT, fontWeight: 800, fontSize: 96, color: INK, lineHeight: 1.05, whiteSpace: 'pre-wrap'}}>
+      <div style={{fontFamily: FONT, fontWeight: 800, fontSize: letters.length > 14 ? 80 : 96, color: INK, lineHeight: 1.05, whiteSpace: 'nowrap'}}>
         {letters.map((ch, i) => {
           const p = bounce(frame, delay + i * 1.6, 220, 9);
           const {sx, sy} = squash(p);
