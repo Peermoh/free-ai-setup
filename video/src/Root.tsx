@@ -13,6 +13,7 @@ import {Typography} from './preview/Typography';
 import {Style2} from './preview/Style2';
 import {KaggleTest} from './preview/KaggleTest';
 import {Keyframes} from './keyframes/Keyframes';
+import {StyleSample} from './flat/StyleSample';
 
 /**
  * Two compositions, same scenes:
@@ -53,6 +54,7 @@ export const RemotionRoot: React.FC = () => (
       width={1080}
       height={1920}
     />
+    <Composition id="FlatSample" component={StyleSample} durationInFrames={1} fps={FPS} width={1080} height={1920} defaultProps={{theme: 'dark' as const}} />
     {/* One still per beat: frame N = beat N. Review these before animating. */}
     <Composition id="Keyframes" component={Keyframes} durationInFrames={10} fps={FPS} width={1080} height={1920} />
     {/* Not part of the film: sample frames for reviewing the look. */}
