@@ -68,13 +68,13 @@ const terminalTexture = () => {
   g.lineWidth = 2;
   g.strokeRect(18, 18, W - 36, H - 36);
   g.fillStyle = CYAN_CSS;
-  g.font = 'bold 54px "JetBrains Mono", monospace';
-  g.fillText('>', 54, 180);
+  g.font = 'bold 44px "JetBrains Mono", monospace';
+  g.fillText('>', 48, 176);
   g.fillStyle = '#ffffff';
-  g.fillText('COMMENT "AI-LOCAL" TO EXECUTE', 110, 180);
+  g.fillText('COMMENT "AI-LOCAL" TO EXECUTE', 92, 176);
   g.fillStyle = 'rgba(255,255,255,0.55)';
-  g.font = '30px "JetBrains Mono", monospace';
-  g.fillText('scripts + guide  ·  free to run', 110, 250);
+  g.font = '27px "JetBrains Mono", monospace';
+  g.fillText('scripts + guide  ·  free to run', 92, 242);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   return t;
@@ -192,21 +192,22 @@ export const build = (
    * (t, -t), and the frame is only ~14.6 world units wide: t beyond about
    * 2.5 pushes a tower off the edge.
    */
-  const T = 2.5;
+  const T = 3.0;
   const towerDefs = [
     {x: T, z: -T, title: 'LOCAL', sub: 'ollama · 3b'},
     {x: 0, z: 0, title: 'FREE TIERS', sub: 'groq · gemini · nvidia'},
     {x: -T, z: T, title: 'KAGGLE', sub: '2 × t4 gpu'},
   ];
-  const towers = towerDefs.map((d) => {
+  const labelYs: number[] = [];
+  const towers = towerDefs.map((d, idx) => {
     const g = new THREE.Group();
-    const box = wireBox(3, 5.2, 3);
+    const box = wireBox(2.2, 5.2, 2.2);
     g.add(box.group);
-    g.add(rackLines(3, 3, 6, 4.2));
+    g.add(rackLines(2.2, 2.2, 6, 4.2));
     g.position.set(d.x, SERVER_Y, d.z);
 
     const label = new THREE.Mesh(
-      new THREE.PlaneGeometry(5.2, 1.3),
+      new THREE.PlaneGeometry(3.9, 0.98),
       new THREE.MeshBasicMaterial({
         map: labelTexture(d.title, d.sub),
         transparent: true,
@@ -215,9 +216,11 @@ export const build = (
       })
     );
     label.renderOrder = 900;
-    label.position.set(d.x, SERVER_Y + 3.9, d.z);
+    const labelY = SERVER_Y + 3.6 + (idx === 1 ? 1.5 : 0); // stagger the middle one
+    label.position.set(d.x, labelY, d.z);
     scene.add(label);
 
+    labelYs.push(labelY);
     scene.add(g);
     return {group: g, box, label};
   });
@@ -307,7 +310,7 @@ export const build = (
     })
   );
   terminal.renderOrder = 999;
-  terminal.position.set(0, LAPTOP_Y + 2.4, 0);
+  terminal.position.set(0, LAPTOP_Y + 1.1, 0);
   scene.add(terminal);
 
   // ---- timeline, matching the four scenes --------------------------------
@@ -365,7 +368,7 @@ export const build = (
       // hide entirely until it starts drawing itself in
       tw.group.visible = tw.group.scale.y > 0.02;
       tw.group.position.y = SERVER_Y + Math.sin(t * 0.7 + i * 1.3) * 0.16;
-      tw.label.position.y = SERVER_Y + 3.9 + Math.sin(t * 0.7 + i * 1.3) * 0.16;
+      tw.label.position.y = labelYs[i] + Math.sin(t * 0.7 + i * 1.3) * 0.16;
     });
     laptop.position.y = LAPTOP_Y + Math.sin(t * 0.6) * 0.14;
     hub.position.y = HUB_Y + Math.sin(t * 0.8 + 1) * 0.12;
