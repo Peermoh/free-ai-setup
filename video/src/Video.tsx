@@ -1,6 +1,14 @@
 import React from 'react';
-import {AbsoluteFill, Sequence} from 'remotion';
-import {C, FPS, SCENES} from './config';
+import {AbsoluteFill, Audio, interpolate, Sequence, staticFile} from 'remotion';
+import {
+  C,
+  FPS,
+  MUSIC_FADE_SECONDS,
+  MUSIC_FILE,
+  MUSIC_VOLUME,
+  SCENES,
+  TOTAL_FRAMES,
+} from './config';
 import {Caption} from './components/Caption';
 import {Hook} from './scenes/Hook';
 import {Twist} from './scenes/Twist';
@@ -30,6 +38,24 @@ const SCENE_COMPONENTS = {
  */
 export const Video: React.FC = () => (
   <AbsoluteFill style={{background: C.bg}}>
+    {/*
+      Optional background music. Nothing is rendered unless MUSIC_FILE is set
+      in config.ts, so the video stays silent by default.
+    */}
+    {MUSIC_FILE ? (
+      <Audio
+        src={staticFile(MUSIC_FILE)}
+        volume={(f) =>
+          interpolate(
+            f,
+            [TOTAL_FRAMES - MUSIC_FADE_SECONDS * FPS, TOTAL_FRAMES],
+            [MUSIC_VOLUME, 0],
+            {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'}
+          )
+        }
+      />
+    ) : null}
+
     {SCENES.map((scene) => {
       const Comp = SCENE_COMPONENTS[scene.id];
       return (

@@ -77,3 +77,22 @@ export const STATS = [
   {big: 'Fallback', small: 'tested with outages'},
   {big: '72', small: 'tokens per “hello”'},
 ] as const;
+
+/**
+ * Optional background music.
+ *
+ * The video is designed to work in silence: LinkedIn autoplays muted and all
+ * meaning is in the captions. Music is a nice-to-have on top.
+ *
+ * To add it: drop a file in video/public/ and put its name here, e.g.
+ *   export const MUSIC_FILE: string | null = 'music.mp3';
+ * Set it back to null to render silent again. Use a track you are licensed
+ * to use; do not commit music you do not have the rights to.
+ */
+export const MUSIC_FILE: string | null = null;
+
+/** How loud the music sits under the video (0 = silent, 1 = full). */
+export const MUSIC_VOLUME = 0.18;
+
+/** Seconds of fade-out at the very end, so it does not cut off abruptly. */
+export const MUSIC_FADE_SECONDS = 2;
