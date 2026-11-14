@@ -2,7 +2,7 @@ import React from 'react';
 import {Img, staticFile} from 'remotion';
 import {C, FONT} from '../config';
 import {useScale} from '../layout';
-import {SHOTS, ShotId} from '../shots';
+import {Shot as ShotDef, SHOTS, ShotId} from '../shots';
 
 /**
  * A real screenshot, cropped and framed.
@@ -27,13 +27,25 @@ export const Shot: React.FC<{
    * with the picture and a note may stick out past its edge.
    */
   overlay?: React.ReactNode;
-}> = ({id, width = 920, showLabel = true, opacity = 1, zoom = 1, overlay}) => {
+  /** Force the light-theme inversion on or off, overriding shots.ts. */
+  invert?: boolean;
+}> = ({id, width = 920, showLabel = true, opacity = 1, zoom = 1, overlay, invert}) => {
   const s = useScale();
-  const shot = SHOTS[id];
+  const shot: ShotDef = SHOTS[id];
   const {crop} = shot;
 
   // How much to scale the source so the crop region is `width` wide.
   const k = width / crop.w;
+
+  /*
+   * Inverting a light screenshot and rotating the hue 180 degrees turns the
+   * page dark while putting the syntax colours back roughly where they were:
+   * a straight invert would make red text cyan. The small contrast and
+   * brightness trim stops the result looking washed out.
+   */
+  const lightFix = (invert ?? shot.light)
+    ? 'invert(1) hue-rotate(180deg) brightness(0.92) contrast(1.08)'
+    : undefined;
 
   const boxW = width * s;
   const boxH = crop.h * k * s;
@@ -62,6 +74,7 @@ export const Shot: React.FC<{
             left: -crop.x * k * s,
             top: -crop.y * k * s,
             transform: `scale(${zoom})`,
+            filter: lightFix,
             transformOrigin: 'center',
             maxWidth: 'none',
           }}

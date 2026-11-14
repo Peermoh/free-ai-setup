@@ -13,6 +13,11 @@ export type Shot = {
   crop: {x: number; y: number; w: number; h: number};
   /** Small label shown under the shot, so a viewer knows what they're seeing. */
   label: string;
+  /**
+   * True for light-theme screenshots. A white panel in a near-black film is a
+   * flash-bang, so these are inverted at render time to sit in the palette.
+   */
+  light?: boolean;
 };
 
 export const SHOTS = {
@@ -63,6 +68,33 @@ export const SHOTS = {
     nh: 819,
     crop: {x: 278, y: 380, w: 1270, h: 340},
     label: 'Routing strategy',
+  },
+  /** Two Tesla T4s, straight from nvidia-smi in the notebook. */
+  gpus: {
+    file: 'shots/kaggle_2.png',
+    nw: 1363,
+    nh: 849,
+    crop: {x: 140, y: 440, w: 620, h: 78},
+    label: 'Kaggle — two Tesla T4',
+    light: true,
+  },
+  /** The notebook's own diagram of the chain. */
+  kaggleFlow: {
+    file: 'shots/kaggle_4.png',
+    nw: 1372,
+    nh: 873,
+    crop: {x: 180, y: 505, w: 1010, h: 242},
+    label: 'Kaggle notebook — the chain',
+    light: true,
+  },
+  /** Ollama up and the model present. */
+  kaggleReady: {
+    file: 'shots/kaggle_3.png',
+    nw: 1372,
+    nh: 843,
+    crop: {x: 140, y: 170, w: 760, h: 60},
+    label: 'Ollama ready on the GPU box',
+    light: true,
   },
 } as const satisfies Record<string, Shot>;
 

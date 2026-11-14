@@ -7,6 +7,7 @@ import {Themes} from './preview/Themes';
 import {WireframeTheme} from './preview/Wireframe';
 import {Constellation} from './preview/Constellation';
 import {Typography} from './preview/Typography';
+import {KaggleTest} from './preview/KaggleTest';
 
 /**
  * Two compositions, same scenes:
@@ -68,6 +69,14 @@ export const RemotionRoot: React.FC = () => (
       id="Typography"
       component={Typography}
       durationInFrames={90}
+      fps={FPS}
+      width={1080}
+      height={1080}
+    />
+    <Composition
+      id="KaggleTest"
+      component={KaggleTest}
+      durationInFrames={60}
       fps={FPS}
       width={1080}
       height={1080}
