@@ -5,6 +5,7 @@ import {Video} from './Video';
 import {ThemePreview} from './preview/ThemePreview';
 import {Themes} from './preview/Themes';
 import {WireframeTheme} from './preview/Wireframe';
+import {Constellation} from './preview/Constellation';
 
 /**
  * Two compositions, same scenes:
@@ -50,6 +51,14 @@ export const RemotionRoot: React.FC = () => (
       id="Wireframe"
       component={WireframeTheme}
       durationInFrames={60}
+      fps={FPS}
+      width={1080}
+      height={1080}
+    />
+    <Composition
+      id="Constellation"
+      component={Constellation}
+      durationInFrames={120}
       fps={FPS}
       width={1080}
       height={1080}
