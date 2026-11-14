@@ -1,0 +1,31 @@
+1
+00:00:00,000 --> 00:00:06,000
+Saying “hello” to my AI cost 4,400 tokens.
+
+2
+00:00:06,000 --> 00:00:12,000
+After a few fixes: 72.
+
+3
+00:00:12,000 --> 00:00:22,000
+Free AI services have daily limits. When one runs out, your chat stops.
+
+4
+00:00:22,000 --> 00:00:40,000
+So I built a front desk. It sends each message to whichever free service is open.
+
+5
+00:00:40,000 --> 00:00:50,000
+Private or work questions? They stay on my laptop.
+
+6
+00:00:50,000 --> 00:01:06,000
+Two commands to set up. One to add a provider.
+
+7
+00:01:06,000 --> 00:01:16,000
+On my setup: 15 of 15 checks passed. Fallback tested.
+
+8
+00:01:16,000 --> 00:01:25,000
+Free guide + scripts: link in the comments.
