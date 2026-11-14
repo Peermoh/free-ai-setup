@@ -10,10 +10,10 @@ import {SHOTS, ShotId} from '../shots';
  * Every object is drawn around its own origin, then placed with a transform,
  * so the same drawing can be the hero of one scene and small in the next.
  */
-export const BG = '#14163a';
-const CARD = '#22255a';
+export const BG = '#000000';
+const CARD = '#1c1c22';
 const INK = '#ffffff';
-const SOFT = '#aab0e6';
+const SOFT = '#b8b8c4';
 const SKY = '#4cc9f0';
 const CORAL = '#ff6b6b';
 const SUN = '#ffc93c';
@@ -87,7 +87,7 @@ type ScreenKind = 'chat' | 'spark' | 'cube' | 'blank';
 const Laptop: React.FC<{screen: ScreenKind}> = ({screen}) => (
   <g>
     <Shadow y={350} w={700} />
-    <rect x={-280} y={0} width={560} height={330} rx={26} fill="#2d2f4f" />
+    <rect x={-280} y={0} width={560} height={330} rx={26} fill="#2a2a31" />
     <rect x={-258} y={22} width={516} height={286} rx={14} fill="#f4f5ff" />
     {screen === 'chat' ? (
       <g>
@@ -107,7 +107,7 @@ const Laptop: React.FC<{screen: ScreenKind}> = ({screen}) => (
       </g>
     ) : null}
     {screen === 'cube' ? <g transform="translate(-120, 50) scale(1.05)"><ModelCube /></g> : null}
-    <polygon points="-340,332 340,332 300,370 -300,370" fill="#44476e" />
+    <polygon points="-340,332 340,332 300,370 -300,370" fill="#3e3e48" />
   </g>
 );
 
@@ -157,7 +157,7 @@ const Title: React.FC<{text: string; sub?: string}> = ({text, sub}) => (
 );
 
 const Pill: React.FC<{text: string; color: string; dark?: boolean}> = ({text, color, dark}) => (
-  <div style={{fontFamily: FONT, fontWeight: 800, fontSize: 38, color: dark ? '#14163a' : '#fff', background: color,
+  <div style={{fontFamily: FONT, fontWeight: 800, fontSize: 38, color: dark ? '#000000' : '#fff', background: color,
     borderRadius: 60, padding: '14px 34px', whiteSpace: 'nowrap'}}>{text}</div>
 );
 
@@ -173,7 +173,7 @@ const Window: React.FC<{id: ShotId; top: number; width?: number; caption?: strin
   const light = 'light' in s && s.light;
   return (
     <div style={{position: 'absolute', top, left: (1080 - width) / 2, width}}>
-      <div style={{background: '#2d2f4f', borderRadius: '22px 22px 0 0', height: 52, display: 'flex', alignItems: 'center', gap: 12, paddingLeft: 22}}>
+      <div style={{background: '#2a2a31', borderRadius: '22px 22px 0 0', height: 52, display: 'flex', alignItems: 'center', gap: 12, paddingLeft: 22}}>
         {[CORAL, SUN, MINT].map((c) => <div key={c} style={{width: 18, height: 18, borderRadius: 9, background: c}} />)}
         <div style={{fontFamily: MONO, fontSize: 26, color: SOFT, marginLeft: 14}}>{caption ?? s.label}</div>
       </div>
@@ -187,10 +187,10 @@ const Window: React.FC<{id: ShotId; top: number; width?: number; caption?: strin
 
 const Terminal: React.FC<{top: number; lines: string[]}> = ({top, lines}) => (
   <div style={{position: 'absolute', top, left: 70, right: 70}}>
-    <div style={{background: '#2d2f4f', borderRadius: '22px 22px 0 0', height: 52, display: 'flex', alignItems: 'center', gap: 12, paddingLeft: 22}}>
+    <div style={{background: '#2a2a31', borderRadius: '22px 22px 0 0', height: 52, display: 'flex', alignItems: 'center', gap: 12, paddingLeft: 22}}>
       {[CORAL, SUN, MINT].map((c) => <div key={c} style={{width: 18, height: 18, borderRadius: 9, background: c}} />)}
     </div>
-    <div style={{background: '#0d0e24', borderRadius: '0 0 22px 22px', padding: '26px 34px', fontFamily: MONO, fontSize: 40, lineHeight: 1.55}}>
+    <div style={{background: '#0b0b0e', borderRadius: '0 0 22px 22px', padding: '26px 34px', fontFamily: MONO, fontSize: 40, lineHeight: 1.55}}>
       {lines.map((l, i) => <div key={i} style={{color: l.startsWith('>') ? MINT : '#e6e8ff'}}>{l}</div>)}
     </div>
   </div>
@@ -231,7 +231,7 @@ const Beat: React.FC<{b: number}> = ({b}) => {
             <circle cx={830} cy={560} r={62} fill={MINT} />
             <path d="M800,562 L822,586 L862,538" fill="none" stroke="#fff" strokeWidth={16} strokeLinecap="round" strokeLinejoin="round" />
             <circle cx={540} cy={1035} r={44} fill={SUN} />
-            <path d="M540,1012 V1058 M517,1035 H563" stroke="#14163a" strokeWidth={12} strokeLinecap="round" />
+            <path d="M540,1012 V1058 M517,1035 H563" stroke="#000000" strokeWidth={12} strokeLinecap="round" />
             <g transform={at(540 - 180, 1095, 1.5)}><Gpu /></g>
           </svg>
           <Title text="IT STILL WORKS" sub="and a GPU makes it bigger" />
@@ -251,7 +251,7 @@ const Beat: React.FC<{b: number}> = ({b}) => {
                 <rect x={90} y={r.y} width={20} height={260} rx={10} fill={r.c} />
                 <g transform={at(140, r.y + 25, 1.0)}>{r.icon}</g>
                 <circle cx={470} cy={r.y + 130} r={46} fill={r.c} />
-                <text x={470} y={r.y + 148} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={48} fill="#14163a">{r.n}</text>
+                <text x={470} y={r.y + 148} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={48} fill="#000000">{r.n}</text>
                 <text x={545} y={r.y + 148} fontFamily={FONT} fontWeight={800} fontSize={52} fill={INK}>{r.name}</text>
               </g>
             ))}

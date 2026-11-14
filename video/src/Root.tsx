@@ -15,6 +15,7 @@ import {KaggleTest} from './preview/KaggleTest';
 import {Keyframes} from './keyframes/Keyframes';
 import {StyleSample} from './flat/StyleSample';
 import {FlatScenes} from './flat/Scenes';
+import {FlatFilm, FLAT_TOTAL} from './flat/Film';
 
 /**
  * Two compositions, same scenes:
@@ -55,6 +56,7 @@ export const RemotionRoot: React.FC = () => (
       width={1080}
       height={1920}
     />
+    <Composition id="Flat" component={FlatFilm} durationInFrames={FLAT_TOTAL} fps={FPS} width={1080} height={1920} />
     <Composition id="FlatScenes" component={FlatScenes} durationInFrames={10} fps={FPS} width={1080} height={1920} />
     <Composition id="FlatSample" component={StyleSample} durationInFrames={1} fps={FPS} width={1080} height={1920} defaultProps={{theme: 'dark' as const}} />
     {/* One still per beat: frame N = beat N. Review these before animating. */}
