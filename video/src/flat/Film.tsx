@@ -418,13 +418,13 @@ const Flow: React.FC<{dur: number}> = ({dur}) => {
     {t0: next - 4, t1: ans, a: RB, b: [810, BY - 90]},
   ]);
   const reply = along(f, [
-    {t0: ans + 2, t1: ans + 14, a: [810, BY - 90], b: RB},
-    {t0: ans + 14, t1: ans + 20, a: RB, b: RT},
-    {t0: ans + 20, t1: ans + 30, a: RT, b: CHAT},
+    {t0: ans + 1, t1: ans + 9, a: [810, BY - 90], b: RB},
+    {t0: ans + 9, t1: ans + 13, a: RB, b: RT},
+    {t0: ans + 13, t1: ans + 19, a: RT, b: CHAT},
   ]);
   const card = pop(f, 2, out, 180, 12);
   const qb = bounce(f, ask, 240, 10);
-  const rb = bounce(f, ans + 30, 240, 10);
+  const rb = bounce(f, ans + 19, 240, 10);
   const r = pop(f, 6, out, 200, 10);
   const isBusy = f >= busy;
   const tag = bounce(f, busy, 260, 9);
@@ -448,7 +448,7 @@ const Flow: React.FC<{dur: number}> = ({dur}) => {
               <text x={155} y={-49} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={30} fill="#fff">WHAT'S A GPU?</text>
             </g>
           ) : null}
-          {f >= ans + 30 ? (
+          {f >= ans + 19 ? (
             <g transform={`translate(-330, 40) scale(${Math.max(0, rb)}) translate(330, -40)`}>
               <rect x={-350} y={0} width={420} height={80} rx={34} fill="#fff" stroke="#dfe3f5" strokeWidth={4} />
               <rect x={-322} y={22} width={300} height={14} rx={7} fill="#c3c8e4" />
