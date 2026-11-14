@@ -2,6 +2,7 @@ import React from 'react';
 import {Composition} from 'remotion';
 import {FPS, TOTAL_FRAMES} from './config';
 import {Video} from './Video';
+import {Simple} from './simple/Simple';
 import {ThreeFilm} from './three/ThreeFilm';
 import {Blueprint, TOTAL_SECONDS as BP_SECONDS} from './three/Blueprint';
 import {ThemePreview} from './preview/ThemePreview';
@@ -19,6 +20,14 @@ import {KaggleTest} from './preview/KaggleTest';
  */
 export const RemotionRoot: React.FC = () => (
   <>
+    <Composition
+      id="Simple"
+      component={Simple}
+      durationInFrames={TOTAL_FRAMES}
+      fps={FPS}
+      width={1080}
+      height={1920}
+    />
     <Composition
       id="Portrait"
       component={Video}
