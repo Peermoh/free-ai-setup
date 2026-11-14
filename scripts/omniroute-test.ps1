@@ -102,7 +102,13 @@ $results | Format-Table -AutoSize -Wrap
 
 # --- Part 2: simulated outages -------------------------------------------------------------
 $groq  = $members | Where-Object { $_ -like 'groq/*' } | Select-Object -First 1
-$local = $members | Select-Object -Last 1
+# The local model is the member that matches a model installed in Ollama on this PC
+$local = $null
+try {
+    $installed = @((Invoke-RestMethod -Uri 'http://localhost:11434/api/tags' -UseBasicParsing).models | ForEach-Object { $_.name })
+    $local = $members | Where-Object { $id = $_; $id -notlike 'ollama-cloud/*' -and ($installed | Where-Object { $id -like "*/$_" }) } | Select-Object -Last 1
+} catch { }
+if (-not $local) { Write-Host "  (test B skipped: no laptop model in '$Name' - start Ollama and run .\ai-sync.ps1)" -ForegroundColor Yellow }
 $fake1 = 'groq/simulated-outage-model-1'
 $fake2 = 'gemini/simulated-outage-model-2'
 
@@ -126,7 +132,7 @@ foreach ($t in $tests) {
     $r = Ask $t.Combo
     # The answering model may be reported with or without its provider prefix
     $expectShort = ($t.Expect -split '/', 2)[1]
-    $hit = $r.Ok -and ($r.By -eq $t.Expect -or $r.By -eq $expectShort -or $t.Expect -like "*$($r.By)")
+    $hit = $r.Ok -and $r.By -and ($r.By -eq $t.Expect -or $r.By -eq $expectShort -or $t.Expect -like "*/$($r.By)")
     if ($hit) {
         Write-Host "     result  : PASS - answered by $($r.By) in $($r.Secs)s" -ForegroundColor Green; $pass++
     } elseif ($r.Ok) {

@@ -84,8 +84,8 @@ try {
         $tools = $tpl.meta.builtinTools
         Write-Host "Using the settings of '$($tpl.id)' as the template."
     } else {
-        $caps = [pscustomobject][ordered]@{ vision = $false; file_upload = $false; web_search = $true; image_generation = $true;
-            code_interpreter = $false; terminal = $true; citations = $false; status_updates = $false; memory = $false; builtin_tools = $false }
+        $caps = [pscustomobject][ordered]@{ vision = $false; file_upload = $false; web_search = $false; image_generation = $false;
+            code_interpreter = $false; terminal = $false; citations = $false; status_updates = $false; memory = $false; builtin_tools = $false }
         $tools = $null
         Write-Host 'No configured model found; using built-in token-saving defaults.'
     }

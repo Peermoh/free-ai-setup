@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "threejs-video",
+  "displayName": "Three.js Video",
+  "version": "0.1.0",
+  "description": "Turn a script into an animated Three.js explainer video rendered with Remotion: a brief template, isometric 9:16 scene templates, and frame-strip review.",
+  "author": {"name": "Peer Mohamed"},
+  "license": "MIT",
+  "keywords": ["three.js", "react-three-fiber", "remotion", "video", "isometric", "explainer", "shorts"]
+}

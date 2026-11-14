@@ -208,7 +208,11 @@ try {
             Invoke-Api PUT "$OmniUrl/api/combos/$($existing.id)" $ManageKey $body | Out-Null
             Write-Host "Combo '$Name' updated ($Strategy, $($final.Count) models)." -ForegroundColor Green
         } catch {
-            # Some versions do not accept PUT: replace it instead
+            # Only when this OmniRoute version does not support PUT (404/405) is the combo replaced.
+            # Any other error keeps the working combo as it is.
+            $putError = $_
+            $code = 0; try { $code = [int]$putError.Exception.Response.StatusCode } catch { }
+            if ($code -ne 404 -and $code -ne 405) { throw $putError }
             Invoke-Api DELETE "$OmniUrl/api/combos/$($existing.id)" $ManageKey | Out-Null
             Invoke-Api POST "$OmniUrl/api/combos" $ManageKey $body | Out-Null
             Write-Host "Combo '$Name' replaced ($Strategy, $($final.Count) models)." -ForegroundColor Green

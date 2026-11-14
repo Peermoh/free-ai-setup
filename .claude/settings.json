@@ -1,0 +1,21 @@
+{
+  "extraKnownMarketplaces": {
+    "remotion": {
+      "source": {
+        "source": "github",
+        "repo": "remotion-dev/claude-code-plugin"
+      }
+    },
+    "free-ai-setup": {
+      "source": {
+        "source": "github",
+        "repo": "Peermoh/free-ai-setup"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "remotion@remotion": true,
+    "threejs-video@free-ai-setup": true,
+    "build-review@free-ai-setup": true
+  }
+}

@@ -144,7 +144,10 @@ if ($Inspect) {
     function Hide($o) {
         if ($o -is [System.Management.Automation.PSCustomObject]) {
             foreach ($p in @($o.PSObject.Properties)) {
-                if ($p.Name -match 'key|token|secret|password|auth|cookie|credential') { $p.Value = '***' } else { Hide $p.Value }
+                if ($p.Name -match 'key|token|secret|password|auth|cookie|credential') { $p.Value = '***' }
+                elseif ($p.Value -is [string] -and $p.Name -match 'url|host|endpoint|domain|address' -and
+                        $p.Value -notmatch '^(https?://)?(localhost|127\.0\.0\.1)(:|/|$)') { $p.Value = '<address hidden>' }
+                else { Hide $p.Value }
             }
         } elseif ($o -is [array]) { foreach ($x in $o) { Hide $x } }
     }
@@ -164,7 +167,8 @@ if ($Inspect) {
             Say (ConvertTo-Json -InputObject $custom -Depth 8)
         } catch { Say "  not available: $(Read-Error $_)" DarkGray }
     }
-    Say "`nCopy everything above and share it, so custom connections can be added by the script too." Yellow
+    Say "`nKeys and non-local addresses are hidden above. Before sharing this anywhere, check again that no key," Yellow
+    Say "token or tunnel address is left in it." Yellow
     return
 }
 
@@ -203,8 +207,8 @@ $menu = @(
        Data = 'Unknown - check whether it trains on or logs prompts';
        Mind = 'Type the provider ID exactly as OmniRoute names it. Avoid unknown relays for anything private.' },
     @{ Id = '#custom';    Name = 'Custom / Kaggle / your laptop Ollama (OpenAI-compatible)'; Cost = 'YOUR OWN'; Key = ''; Where = '';
-       Limits = 'Kaggle: weekly GPU hours. Laptop: unlimited';
-       Data = 'Laptop Ollama: nothing leaves your PC. Kaggle: your own notebook, reached through a tunnel';
+       Limits = 'Kaggle: weekly GPU hours. Laptop: no provider quota - limited by your PC''s speed and memory';
+       Data = 'Laptop Ollama: nothing leaves your PC. Kaggle is cloud: prompts travel through a tunnel to a cloud machine - not for personal, company, client or bank data';
        Mind = 'Added once in the OmniRoute page; this script then lists its models.' }
 )
 

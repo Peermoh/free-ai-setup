@@ -1,0 +1,92 @@
+[
+ {
+  "id": "hook",
+  "from": 0.0,
+  "dur": 4.5,
+  "cam": "push",
+  "bg": "open",
+  "settle": false,
+  "caption": "You can build your own AI setup, on the laptop you already have."
+ },
+ {
+  "id": "nogpu",
+  "from": 4.5,
+  "dur": 4.5,
+  "cam": "panL",
+  "bg": "cool",
+  "settle": false,
+  "caption": "Most of us don't have a powerful machine. No big GPU."
+ },
+ {
+  "id": "still",
+  "from": 9.0,
+  "dur": 6.0,
+  "cam": "push",
+  "bg": "surge",
+  "settle": false,
+  "caption": "This still works. And if you do have a GPU, it gets seriously powerful."
+ },
+ {
+  "id": "three",
+  "from": 15.0,
+  "dur": 2.5,
+  "cam": "pull",
+  "bg": "three",
+  "settle": false,
+  "caption": "It comes down to three things."
+ },
+ {
+  "id": "local",
+  "from": 17.5,
+  "dur": 4.5,
+  "cam": "push",
+  "bg": "local",
+  "settle": false,
+  "caption": "One. A model running on your own machine. That's Ollama."
+ },
+ {
+  "id": "tiers",
+  "from": 22.0,
+  "dur": 6.0,
+  "cam": "panR",
+  "bg": "tiers",
+  "settle": true,
+  "caption": "Two. Free tiers from Groq, Gemini, NVIDIA and OpenRouter."
+ },
+ {
+  "id": "gpu",
+  "from": 28.0,
+  "dur": 4.5,
+  "cam": "push",
+  "bg": "gpu",
+  "settle": true,
+  "caption": "Three. A free GPU. Kaggle gives you two."
+ },
+ {
+  "id": "route",
+  "from": 32.5,
+  "dur": 5.5,
+  "cam": "pull",
+  "bg": "route",
+  "settle": false,
+  "caption": "Now connect them. OmniRoute, an open source router, sits in front."
+ },
+ {
+  "id": "chat",
+  "from": 38.0,
+  "dur": 4.5,
+  "cam": "push",
+  "bg": "chat",
+  "settle": true,
+  "caption": "And Open WebUI gives you one chat page for all of it."
+ },
+ {
+  "id": "cta",
+  "from": 42.5,
+  "dur": 4.0,
+  "cam": "push",
+  "bg": "cta",
+  "settle": false,
+  "caption": "Comment ai-local and I'll share the scripts and the guide."
+ }
+]

@@ -102,7 +102,11 @@ if ($Install) {
     # Local model
     if (Get-Command ollama -ErrorAction SilentlyContinue) {
         if ((& ollama list 2>$null) -match [regex]::Escape($LocalModel)) { Skip "local model $LocalModel already present" }
-        else { Say "  ...   downloading local model $LocalModel (about 2 GB)"; & ollama pull $LocalModel; Ok "local model $LocalModel" }
+        else {
+            Say "  ...   downloading local model $LocalModel (about 2 GB)"; & ollama pull $LocalModel
+            if ($LASTEXITCODE -eq 0) { Ok "local model $LocalModel" }
+            else { Warn "downloading $LocalModel failed"; $todo.Add("Run: ollama pull $LocalModel") }
+        }
     }
 
     # OmniRoute (global, fixed version)
@@ -112,8 +116,10 @@ if ($Install) {
             # Running it with "npx omniroute" only uses a temporary copy that can change version on its own.
             Say '  ...   installing OmniRoute permanently (npm install -g) - your settings and keys are kept'
             & npm install -g omniroute | Out-Null
+            $npmExit = $LASTEXITCODE
             Refresh-Path
-            Ok 'OmniRoute installed - after starting it, check providers with: .\ai-sync.ps1 -Test'
+            if ($npmExit -eq 0) { Ok 'OmniRoute installed - after starting it, check providers with: .\ai-sync.ps1 -Test' }
+            else { Warn 'installing OmniRoute failed'; $todo.Add('Run: npm install -g omniroute') }
         }
     }
 
@@ -127,7 +133,8 @@ if ($Install) {
         else {
             Say '  ...   installing Open WebUI (15-30 minutes, may look frozen - this is normal)'
             & py -3.11 -m pip install open-webui
-            Ok 'Open WebUI installed'
+            if ($LASTEXITCODE -eq 0) { Ok 'Open WebUI installed' }
+            else { Warn 'installing Open WebUI failed'; $todo.Add('Run: py -3.11 -m pip install open-webui') }
         }
         # Put Python's Scripts folder on PATH so "open-webui" works in every window
         $scripts = (& py -3.11 -c "import sysconfig; print(sysconfig.get_path('scripts'))").Trim()
@@ -208,15 +215,21 @@ if ($Configure) {
     if ($owuiUp -and $env:OWUI_KEY -and $env:OMNIROUTE_KEY) {
         Say "`n=== 3. Open WebUI ===" Cyan
 
-        # Connection to OmniRoute (keeps your existing model list)
+        # Connection to OmniRoute: added or updated; any other connections you set up are kept
         try {
             $cfg = Invoke-Api GET "$Url/openai/config" $env:OWUI_KEY
             $cfg.ENABLE_OPENAI_API = $true
-            $cfg.OPENAI_API_BASE_URLS = @("$OmniUrl/v1")
-            $cfg.OPENAI_API_KEYS = @($env:OMNIROUTE_KEY)
+            $urls = @(); if ($cfg.OPENAI_API_BASE_URLS) { $urls = @($cfg.OPENAI_API_BASE_URLS) }
+            $keys = @(); if ($cfg.OPENAI_API_KEYS) { $keys = @($cfg.OPENAI_API_KEYS) }
+            while ($keys.Count -lt $urls.Count) { $keys += '' }
+            $slot = [array]::IndexOf($urls, "$OmniUrl/v1")
+            if ($slot -lt 0) { $urls += "$OmniUrl/v1"; $keys += $env:OMNIROUTE_KEY; $slot = $urls.Count - 1 }
+            else { $keys[$slot] = $env:OMNIROUTE_KEY }
+            $cfg.OPENAI_API_BASE_URLS = $urls
+            $cfg.OPENAI_API_KEYS = $keys
             if (-not $cfg.OPENAI_API_CONFIGS) { $cfg | Add-Member -NotePropertyName OPENAI_API_CONFIGS -NotePropertyValue ([pscustomobject]@{}) -Force }
-            if (-not $cfg.OPENAI_API_CONFIGS.'0') {
-                $cfg.OPENAI_API_CONFIGS | Add-Member -NotePropertyName '0' -NotePropertyValue ([pscustomobject]@{ enable = $true; model_ids = @() }) -Force
+            if (-not $cfg.OPENAI_API_CONFIGS."$slot") {
+                $cfg.OPENAI_API_CONFIGS | Add-Member -NotePropertyName "$slot" -NotePropertyValue ([pscustomobject]@{ enable = $true; model_ids = @() }) -Force
             }
             Invoke-Api POST "$Url/openai/config/update" $env:OWUI_KEY $cfg | Out-Null
             Ok "connected to OmniRoute ($OmniUrl/v1)"
