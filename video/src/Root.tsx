@@ -7,6 +7,7 @@ import {Themes} from './preview/Themes';
 import {WireframeTheme} from './preview/Wireframe';
 import {Constellation} from './preview/Constellation';
 import {Typography} from './preview/Typography';
+import {Style2} from './preview/Style2';
 import {KaggleTest} from './preview/KaggleTest';
 
 /**
@@ -77,6 +78,14 @@ export const RemotionRoot: React.FC = () => (
       id="KaggleTest"
       component={KaggleTest}
       durationInFrames={60}
+      fps={FPS}
+      width={1080}
+      height={1080}
+    />
+    <Composition
+      id="Style2"
+      component={Style2}
+      durationInFrames={120}
       fps={FPS}
       width={1080}
       height={1080}
