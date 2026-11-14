@@ -5,8 +5,8 @@ import '@fontsource/jetbrains-mono/700.css';
 import '@fontsource/space-grotesk/700.css';
 import {useScale} from '../layout';
 import {Shot} from '../components/Shot';
-import {Atmosphere, DesignFrame, Floor, GROTESK, Hud, INK, MONO} from './constellation-lib';
-import {Fill, Framed, Marked, Measure, Outline, Tag} from './type-lib';
+import {Atmosphere, DesignFrame, Floor, GROTESK, Hud, INK, MONO} from '../design/world';
+import {Fill, Framed, Marked, Measure, Outline, Tag} from '../design/type';
 
 /**
  * Frame 0: the light Kaggle screenshots as they are, next to the inverted

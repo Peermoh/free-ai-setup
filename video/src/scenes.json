@@ -1,10 +1,12 @@
 [
-  {"id": "hook",      "from": 0,  "dur": 6,  "caption": "Saying “hello” to my AI cost 4,400 tokens."},
-  {"id": "twist",     "from": 6,  "dur": 6,  "caption": "After a few fixes: 72."},
-  {"id": "problem",   "from": 12, "dur": 10, "caption": "Free AI services have daily limits. When one runs out, your chat stops."},
-  {"id": "frontdesk", "from": 22, "dur": 18, "caption": "So I built a front desk. It sends each message to whichever free service is open."},
-  {"id": "privacy",   "from": 40, "dur": 10, "caption": "Private or work questions? They stay on my laptop."},
-  {"id": "scripts",   "from": 50, "dur": 16, "caption": "Two commands to set up. One to add a provider."},
-  {"id": "proof",     "from": 66, "dur": 10, "caption": "On my setup: 15 of 15 checks passed. Fallback tested."},
-  {"id": "cta",       "from": 76, "dur": 9,  "caption": "Free guide + scripts: link in the comments."}
+  {"id": "hook",    "from": 0,  "dur": 7,  "settle": false, "caption": "Where can an AI model actually run?"},
+  {"id": "places",  "from": 7,  "dur": 9,  "settle": false, "caption": "Three places: someone else's server, your laptop, a borrowed GPU."},
+  {"id": "tiers",   "from": 16, "dur": 9,  "settle": true,  "caption": "Cloud tiers are fast and free — until the daily limit."},
+  {"id": "laptop",  "from": 25, "dur": 8,  "settle": false, "caption": "Your laptop has no limit, but it is slow."},
+  {"id": "kaggle",  "from": 33, "dur": 11, "settle": true,  "caption": "Kaggle lends you two GPUs, a few hours a week."},
+  {"id": "router",  "from": 44, "dur": 11, "settle": false, "caption": "So you do not pick one. You put a router in front."},
+  {"id": "order",   "from": 55, "dur": 13, "settle": true,  "caption": "It tries them in order. Out of quota? The next one answers."},
+  {"id": "privacy", "from": 68, "dur": 8,  "settle": false, "caption": "Private or work questions skip the cloud entirely."},
+  {"id": "honest",  "from": 76, "dur": 7,  "settle": true,  "caption": "None of this is new. Open tools, wired together."},
+  {"id": "explore", "from": 83, "dur": 6,  "settle": true,  "caption": "Scripts and a guide, if you want to take it apart."}
 ]

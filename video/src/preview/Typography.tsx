@@ -13,8 +13,8 @@ import {
   INK,
   MONO,
   RED,
-} from './constellation-lib';
-import {Fill, Framed, Marked, Measure, Outline, SideLabel, Tag, Underlined} from './type-lib';
+} from '../design/world';
+import {Fill, Framed, Marked, Measure, Outline, SideLabel, Tag, Underlined} from '../design/type';
 
 /**
  * Theme option 5b — the Constellation world, but with the TYPE designed.

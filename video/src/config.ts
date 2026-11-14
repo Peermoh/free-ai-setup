@@ -15,6 +15,8 @@ export type Scene = {
   from: number;
   dur: number;
   caption: string;
+  /** True on scenes carrying a screenshot: the camera nearly stops so it reads. */
+  settle: boolean;
 };
 
 /** Filled in by the owner. Shown in the final scene. */
@@ -46,8 +48,8 @@ export const FONT =
 export const SCENES = sceneTable as readonly Scene[];
 
 export type SceneId =
-  | 'hook' | 'twist' | 'problem' | 'frontdesk'
-  | 'privacy' | 'scripts' | 'proof' | 'cta';
+  | 'hook' | 'places' | 'tiers' | 'laptop' | 'kaggle'
+  | 'router' | 'order' | 'privacy' | 'honest' | 'explore';
 
 /** Total length in seconds: 85 s, inside the 75-90 s target. */
 export const TOTAL_SECONDS = SCENES.reduce((a, s) => Math.max(a, s.from + s.dur), 0);

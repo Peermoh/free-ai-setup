@@ -19,7 +19,7 @@ import {
   P3,
   project,
   VIOLET,
-} from './constellation-lib';
+} from '../design/world';
 
 /**
  * Theme option 5 — "Constellation".

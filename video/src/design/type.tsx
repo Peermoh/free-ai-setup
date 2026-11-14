@@ -1,5 +1,5 @@
 import React from 'react';
-import {GROTESK, INK, MONO} from './constellation-lib';
+import {GROTESK, INK, MONO} from './world';
 
 /**
  * Typographic treatments. The point is that a line of text is built out of
