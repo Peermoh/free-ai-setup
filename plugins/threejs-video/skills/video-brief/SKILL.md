@@ -11,6 +11,23 @@ re-uses the same object until the film reads as a loop.
 
 ## Steps
 
+0. **Intake.** Before drafting, make sure you have each of these:
+
+   | Input | Example |
+   |---|---|
+   | Script or talking points, in the person's own words | the narration, line by line |
+   | Format | 1080×1920 (9:16), about 45 seconds |
+   | Look | background, object style, accent colours — or a reference image or video |
+   | Audience, and the single action for the close | "comment ai-local" |
+   | Narration | already recorded / generate it (which voice) / none |
+   | Music | a track, a mood, or none |
+   | Evidence | real screenshots or recordings to include |
+
+   If any are missing, ask for **only the missing ones, in a single message**,
+   and wait. If all are already known from the conversation, say so in one line
+   — "Using: …" — and carry on. Do not ask for the sake of asking, and never
+   guess the look or the script.
+
 1. **Get the script.** If the user has one, use their words. Do not rewrite the
    narration unless asked; tighten it only for spoken rhythm, and show the diff.
 2. **Fill the brief** from `templates/brief.md`. One block per scene.

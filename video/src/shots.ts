@@ -45,6 +45,14 @@ export const SHOTS = {
     crop: {x: 0, y: 62, w: 1120, h: 288},
     label: 'add-provider.ps1',
   },
+  /** The first four lines of the provider menu, large enough to read on a phone. */
+  providerTop: {
+    file: 'shots/1_script.png',
+    nw: 1702,
+    nh: 871,
+    crop: {x: 0, y: 62, w: 470, h: 150},
+    label: 'add-provider.ps1',
+  },
   /** Proof the combos and models are live. */
   sync: {
     file: 'shots/3_script.png',
