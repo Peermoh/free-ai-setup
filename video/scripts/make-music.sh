@@ -4,8 +4,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-LEN_MS="${LEN_MS:-70000}"
-PROMPT="${PROMPT:-Minimal electronic underscore for a focused technical walkthrough. Soft pulsing synth arpeggio, warm sub bass, gentle hi-hats, hopeful and clean, steady 100 BPM, no vocals, no sudden drops, sits quietly under a narrator.}"
+LEN_MS="${LEN_MS:-60000}"
+PROMPT="${PROMPT:-Cinematic synthwave with a solid beat. Wide analog pads and a pulsing bass arpeggio over punchy kick, snare and crisp hi-hats. Hopeful, modern tech documentary energy, 112 BPM, no vocals, steady groove that drives a tutorial forward without crowding a narrator.}"
 
 body=$(python3 -c "
 import json,sys
