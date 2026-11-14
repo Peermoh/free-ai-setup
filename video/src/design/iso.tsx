@@ -317,3 +317,100 @@ export const ChatCard: React.FC<{x: number; y: number; scale?: number}> = ({
     <rect x={16} y={110} width={150} height={12} rx={6} fill="rgba(255,255,255,.12)" />
   </g>
 );
+
+/* ------------------------------------------------------- motion pieces */
+
+/** Where a prop's "socket" sits, for routing lines between objects. */
+export const socket = (x: number, y: number, z = 0) => iso(x, y, z);
+
+/**
+ * A route between two points in isometric space: the line draws itself, then
+ * packets run along it. This is how the film shows a request being routed
+ * rather than asserting that it is.
+ */
+export const IsoRoute: React.FC<{
+  from: [number, number, number];
+  to: [number, number, number];
+  /** 0..1 how much of the line is drawn. */
+  draw?: number;
+  /** 0..1 positions of packets along the line; empty for none. */
+  packets?: number[];
+  colour?: string;
+  dash?: boolean;
+}> = ({from, to, draw = 1, packets = [], colour = 'rgba(190,210,245,.55)', dash}) => {
+  const a = iso(...from);
+  const b = iso(...to);
+  const x2 = a[0] + (b[0] - a[0]) * draw;
+  const y2 = a[1] + (b[1] - a[1]) * draw;
+  return (
+    <g>
+      <line
+        x1={a[0]}
+        y1={a[1]}
+        x2={x2}
+        y2={y2}
+        stroke={colour}
+        strokeWidth={2}
+        strokeDasharray={dash ? '7 7' : undefined}
+      />
+      {packets.map((t, i) => {
+        if (t < 0 || t > 1) return null;
+        const px = a[0] + (b[0] - a[0]) * t;
+        const py = a[1] + (b[1] - a[1]) * t;
+        return (
+          <g key={i}>
+            <circle cx={px} cy={py} r={9} fill={ACCENT} opacity={0.28} />
+            <circle cx={px} cy={py} r={4.2} fill="#fff" />
+          </g>
+        );
+      })}
+    </g>
+  );
+};
+
+/** A small glowing cube, for "a model" sitting on a machine. */
+export const ModelCube: React.FC<{x?: number; y?: number; lift?: number; hot?: boolean}> = ({
+  x = 0,
+  y = 0,
+  lift = 0,
+  hot,
+}) => (
+  <g>
+    <IsoBox
+      x={x}
+      y={y}
+      z={lift}
+      w={46}
+      d={46}
+      h={46}
+      shades={
+        hot
+          ? {top: '#ffb264', left: ACCENT, right: '#c05c10'}
+          : {top: '#55678a', left: '#38465f', right: '#243043'}
+      }
+    />
+  </g>
+);
+
+/** A crossed-out slot: the GPU a cheap laptop does not have. */
+export const EmptySlot: React.FC<{x?: number; y?: number}> = ({x = 0, y = 0}) => {
+  const a = iso(x, y, 0);
+  const b = iso(x + 175, y + 80, 0);
+  const c = iso(x + 175, y, 0);
+  const d = iso(x, y + 80, 0);
+  return (
+    <g>
+      <polygon
+        points={[iso(x, y, 0), iso(x + 175, y, 0), iso(x + 175, y + 80, 0), iso(x, y + 80, 0)]
+          .map((p) => p.join(','))
+          .join(' ')}
+        fill="rgba(255,255,255,.04)"
+        stroke="rgba(255,255,255,.22)"
+        strokeDasharray="8 7"
+        strokeWidth={2}
+      />
+      <line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke="#ff5d5d" strokeWidth={3} />
+      <line x1={c[0]} y1={c[1]} x2={d[0]} y2={d[1]} stroke="#ff5d5d" strokeWidth={3} />
+    </g>
+  );
+};

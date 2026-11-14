@@ -17,20 +17,19 @@ import {
   VOICEOVER_VOLUME,
 } from './config';
 import {useScale} from './layout';
-import {Backdrop} from './design/backdrop';
-import {Progress} from './design/anim';
-import {MONO, VIOLET} from './design/world';
-import {SCENES_BY_ID} from './scenes/film';
+import {ACCENT} from './design/iso';
+import {ISO_SCENES} from './scenes/isofilm';
+import {CallToAction, Chip, Fine, Karaoke, OVERLAYS, Segments, Source} from './scenes/overlay';
 
 /**
- * The film.
+ * The film: isometric stages in a blue-black room, annotated with chips and
+ * a karaoke caption, with the camera moving across every scene.
  *
- * There is no subtitle bar. Each scene brings its own moving background and
- * its own text beats, and the camera makes a deliberate move across it.
+ * Everything is authored in a 1080 square and scaled once, so the isometric
+ * maths never has to carry a scale factor.
  */
 
-/** Scales the 1080 square the scenes are authored in. */
-const DesignFrame: React.FC<{children: React.ReactNode}> = ({children}) => {
+const Square: React.FC<{children: React.ReactNode}> = ({children}) => {
   const s = useScale();
   return (
     <AbsoluteFill>
@@ -52,17 +51,17 @@ const DesignFrame: React.FC<{children: React.ReactNode}> = ({children}) => {
   );
 };
 
-const useActiveScene = () => {
-  const frame = useCurrentFrame();
-  const t = frame / FPS;
-  return SCENES.find((s) => t >= s.from && t < s.from + s.dur) ?? SCENES[SCENES.length - 1];
-};
+/** Blue-black room. The floor is drawn inside the stage, in iso space. */
+const Room: React.FC = () => (
+  <AbsoluteFill style={{background: '#070c16'}}>
+    <AbsoluteFill
+      style={{
+        background: 'radial-gradient(70% 50% at 50% 26%, #0f1a2d 0%, #070c16 74%)',
+      }}
+    />
+  </AbsoluteFill>
+);
 
-/**
- * Music volume at a frame: quiet under narration, up in the gaps, faded at
- * both ends. The ramps run over several frames because an instant level
- * change is audible as a click.
- */
 const musicVolumeAt = (f: number) => {
   const t = f / FPS;
   const speaking = SCENES.some((s) => {
@@ -75,102 +74,95 @@ const musicVolumeAt = (f: number) => {
   return target * fadeIn * Math.max(0, fadeOut);
 };
 
-export const Video: React.FC = () => {
+/** One scene: its stage, its camera move, and its overlay. */
+const SceneBlock: React.FC<{i: number}> = ({i}) => {
+  const scene = SCENES[i];
   const frame = useCurrentFrame();
-  const s = useScale();
-  const active = useActiveScene();
+  const Stage = ISO_SCENES[scene.id];
+  const over = OVERLAYS[scene.id];
+  const dur = scene.dur * FPS;
 
-  // A deliberate move across each scene, plus a drift shared by the film.
-  const amp = active.settle ? 0.25 : 1;
-  const local = (frame - active.from * FPS) / (active.dur * FPS);
-  const ease = 0.5 - Math.cos(Math.min(1, Math.max(0, local)) * Math.PI) / 2;
-  const moves = {
-    push: {sx: 1 + ease * 0.085, mx: 0, my: -ease * 13},
-    pull: {sx: 1.055 - ease * 0.055, mx: 0, my: ease * 10},
-    panL: {sx: 1.05, mx: (0.5 - ease) * 140, my: 0},
-    panR: {sx: 1.05, mx: (ease - 0.5) * 140, my: 0},
-  } as const;
-  const mv = moves[active.cam];
-  const tx = Math.sin(frame / 92) * 11 * amp + mv.mx * (active.settle ? 0.45 : 1);
-  const ty = Math.cos(frame / 118) * 7 * amp + mv.my;
-  const rot = Math.sin(frame / 165) * 0.45 * amp;
-  const scale = 1 + (mv.sx - 1) * (active.settle ? 0.5 : 1);
+  // The camera crosses the stage: a slow push, pull or pan, eased in and out.
+  const e = 0.5 - Math.cos(Math.min(1, Math.max(0, frame / dur)) * Math.PI) / 2;
+  const cam = {
+    push: {k: 1 + e * 0.17, dx: 0, dy: -e * 46},
+    pull: {k: 1.17 - e * 0.17, dx: 0, dy: e * 40},
+    panL: {k: 1.08, dx: (0.5 - e) * 230, dy: -e * 14},
+    panR: {k: 1.08, dx: (e - 0.5) * 230, dy: -e * 14},
+  }[scene.cam];
 
   return (
-    <AbsoluteFill style={{background: '#05040c'}}>
-      {MUSIC_FILE ? (
-        <Audio src={staticFile(MUSIC_FILE)} volume={(f) => musicVolumeAt(f)} />
-      ) : null}
+    <Square>
+      <svg width={1080} height={1080} style={{position: 'absolute', inset: 0}}>
+        <g transform={`translate(${540 + cam.dx} ${470 + cam.dy}) scale(${cam.k})`}>
+          <Stage />
+        </g>
+      </svg>
 
-      {/* Each explanation brings its own moving background. */}
-      {SCENES.map((scene) => (
-        <Sequence
-          key={`bg-${scene.id}`}
-          from={scene.from * FPS}
-          durationInFrames={scene.dur * FPS}
-          name={`${scene.id}-bg`}
-          layout="none"
-        >
-          <SceneBackdrop id={scene.bg} />
-        </Sequence>
+      <Source text={over.source} />
+      <Segments done={i + 1} total={SCENES.length} />
+      {over.chips.map((c) => (
+        <Chip key={c.text} {...c} />
       ))}
-
-      <AbsoluteFill
-        style={{transform: `translate(${tx}px,${ty}px) rotate(${rot}deg) scale(${scale})`}}
-      >
-        {SCENES.map((scene) => {
-          const Comp = SCENES_BY_ID[scene.id];
-          return (
-            <Sequence
-              key={scene.id}
-              from={scene.from * FPS}
-              durationInFrames={scene.dur * FPS}
-              name={scene.id}
-              layout="none"
-            >
-              <DesignFrame>
-                <Comp />
-              </DesignFrame>
-            </Sequence>
-          );
-        })}
-      </AbsoluteFill>
-
-      {/* Narration, one clip per scene, a beat after the scene opens. */}
-      {VOICEOVER
-        ? SCENES.map((scene) => (
-            <Sequence
-              key={`vo-${scene.id}`}
-              from={Math.round((scene.from + VOICEOVER_DELAY_SECONDS) * FPS)}
-              durationInFrames={scene.dur * FPS}
-              name={`${scene.id}-vo`}
-              layout="none"
-            >
-              <Audio src={staticFile(`vo/${scene.id}.mp3`)} volume={VOICEOVER_VOLUME} />
-            </Sequence>
-          ))
-        : null}
-
-      <div
-        style={{
-          position: 'absolute',
-          right: 30 * s,
-          top: 26 * s,
-          fontFamily: MONO,
-          fontSize: 15 * s,
-          letterSpacing: 2,
-          color: 'rgba(236,234,255,.35)',
-        }}
-      >
-        AI-LOCAL
-      </div>
-      <Progress total={TOTAL_FRAMES} colour={VIOLET} />
-    </AbsoluteFill>
+      {over.cta ? (
+        <CallToAction />
+      ) : (
+        <Karaoke text={scene.caption} durationInFrames={dur} hot={over.hot} />
+      )}
+      <Fine text={over.fine} />
+    </Square>
   );
 };
 
-/** Wrapper so the backdrop sees frames relative to its own scene. */
-const SceneBackdrop: React.FC<{id: Parameters<typeof Backdrop>[0]['id']}> = ({id}) => {
-  const f = useCurrentFrame();
-  return <Backdrop id={id} sceneFrame={f} />;
+export const Video: React.FC = () => (
+  <AbsoluteFill style={{background: '#070c16'}}>
+    {MUSIC_FILE ? (
+      <Audio src={staticFile(MUSIC_FILE)} volume={(f) => musicVolumeAt(f)} />
+    ) : null}
+    <Room />
+
+    {SCENES.map((scene, i) => (
+      <Sequence
+        key={scene.id}
+        from={scene.from * FPS}
+        durationInFrames={scene.dur * FPS}
+        name={scene.id}
+        layout="none"
+      >
+        <SceneBlock i={i} />
+      </Sequence>
+    ))}
+
+    {VOICEOVER
+      ? SCENES.map((scene) => (
+          <Sequence
+            key={`vo-${scene.id}`}
+            from={Math.round((scene.from + VOICEOVER_DELAY_SECONDS) * FPS)}
+            durationInFrames={scene.dur * FPS}
+            name={`${scene.id}-vo`}
+            layout="none"
+          >
+            <Audio src={staticFile(`vo/${scene.id}.mp3`)} volume={VOICEOVER_VOLUME} />
+          </Sequence>
+        ))
+      : null}
+
+    <Progress />
+  </AbsoluteFill>
+);
+
+const Progress: React.FC = () => {
+  const frame = useCurrentFrame();
+  return (
+    <div style={{position: 'absolute', left: 0, right: 0, bottom: 0, height: 4}}>
+      <div
+        style={{
+          height: '100%',
+          width: `${Math.min(100, (frame / TOTAL_FRAMES) * 100)}%`,
+          background: ACCENT,
+          opacity: 0.9,
+        }}
+      />
+    </div>
+  );
 };
