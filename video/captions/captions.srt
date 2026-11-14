@@ -1,39 +1,35 @@
 1
 00:00:00,000 --> 00:00:05,000
-Where can an AI model actually run?
+Run real AI on your own laptop. For free.
 
 2
-00:00:05,000 --> 00:00:12,000
-Three places: someone else's server, your laptop, a borrowed GPU.
+00:00:05,000 --> 00:00:14,000
+One chat page. A router. Three places to run a model.
 
 3
-00:00:12,000 --> 00:00:19,000
-Cloud tiers are fast and free — until the daily limit.
+00:00:14,000 --> 00:00:22,000
+Step one: one command installs everything.
 
 4
-00:00:19,000 --> 00:00:24,000
-Your laptop has no limit, but it is slow.
+00:00:22,000 --> 00:00:30,000
+Step two: add free providers. The script shows every limit.
 
 5
-00:00:24,000 --> 00:00:32,000
-Kaggle lends you two GPUs, a few hours a week.
+00:00:30,000 --> 00:00:37,000
+Step three: a model on your own machine. Nothing leaves it.
 
 6
-00:00:32,000 --> 00:00:40,000
-So you do not pick one. You put a router in front.
+00:00:37,000 --> 00:00:47,000
+Step four: borrow two free GPUs from Kaggle.
 
 7
-00:00:40,000 --> 00:00:50,000
-It tries them in order. Out of quota? The next one answers.
+00:00:47,000 --> 00:00:57,000
+The router tries them in order. Out of quota? Next one answers.
 
 8
-00:00:50,000 --> 00:00:56,000
-Private or work questions skip the cloud entirely.
+00:00:57,000 --> 00:01:04,000
+Six providers, fifteen models, one chat page.
 
 9
-00:00:56,000 --> 00:01:02,000
-None of this is new. Open tools, wired together.
-
-10
-00:01:02,000 --> 00:01:07,000
-Scripts and a guide, if you want to take it apart.
+00:01:04,000 --> 00:01:10,000
+Want the scripts? Tell me in the comments.

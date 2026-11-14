@@ -1,70 +1,108 @@
 import React from 'react';
-import {useCurrentFrame} from 'remotion';
-import {C, FONT} from '../config';
-import {useScale} from '../layout';
-
-export type TermLine = {
-  /** Frame (relative to the scene) when this line starts typing. */
-  at: number;
-  text: string;
-  /** A line that simply appears, e.g. a tick or a menu row. */
-  instant?: boolean;
-  colour?: string;
-};
+import {interpolate, useCurrentFrame} from 'remotion';
+import {GREEN, INK, MONO, VIOLET} from '../design/world';
 
 /**
- * A PowerShell-looking window that types its lines out.
- * Typing is derived from the frame number, so it is deterministic: Remotion
- * renders frames out of order and nothing may depend on real time.
+ * A terminal that actually runs.
+ *
+ * The command types itself a character at a time, then its output arrives
+ * line by line, with ticks and an optional progress bar. Everything is
+ * derived from the frame number, never from real time, because Remotion
+ * renders frames out of order.
  */
-export const Terminal: React.FC<{lines: TermLine[]; width?: number}> = ({
-  lines,
-  width = 870,
-}) => {
+
+export type Line =
+  | {at: number; kind: 'cmd'; text: string}
+  | {at: number; kind: 'out'; text: string}
+  | {at: number; kind: 'ok'; text: string}
+  | {at: number; kind: 'bar'; text: string; frames: number};
+
+export const Terminal: React.FC<{
+  lines: Line[];
+  width?: number;
+  title?: string;
+  cps?: number;
+}> = ({lines, width = 880, title = 'PowerShell', cps = 2.1}) => {
   const frame = useCurrentFrame();
-  const s = useScale();
-  const CPF = 1.6; // characters typed per frame
 
   return (
     <div
       style={{
-        boxSizing: 'border-box',
-        width: width * s,
-        minHeight: 300 * s,
-        padding: 26 * s,
-        borderRadius: 18 * s,
-        overflow: 'hidden',
-        background: '#0b0b0b',
-        border: `${1.5 * s}px solid ${C.cardEdge}`,
-        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
-        fontSize: 27 * s,
-        lineHeight: 1.6,
+        width,
+        padding: 26,
+        borderRadius: 16,
+        background: 'rgba(6,5,14,.92)',
+        border: '1.5px solid rgba(160,130,255,.30)',
+        boxShadow: '0 24px 70px rgba(0,0,0,.6), 0 0 60px rgba(122,70,255,.15)',
+        fontFamily: MONO,
+        fontSize: 27,
+        lineHeight: 1.65,
         textAlign: 'left',
+        overflow: 'hidden',
       }}
     >
-      {/* window chrome */}
-      <div style={{display: 'flex', gap: 9 * s, marginBottom: 18 * s}}>
-        {[C.red, '#eab308', C.green].map((c) => (
-          <div
-            key={c}
-            style={{width: 13 * s, height: 13 * s, borderRadius: 999, background: c}}
-          />
+      <div style={{display: 'flex', gap: 9, marginBottom: 16, alignItems: 'center'}}>
+        {['#ff5f57', '#febc2e', '#28c840'].map((c) => (
+          <div key={c} style={{width: 12, height: 12, borderRadius: 999, background: c}} />
         ))}
-        <div style={{color: C.muted, fontFamily: FONT, fontSize: 21 * s, marginLeft: 10 * s}}>
-          PowerShell
-        </div>
+        <span style={{marginLeft: 10, fontSize: 19, color: 'rgba(236,234,255,.45)'}}>
+          {title}
+        </span>
       </div>
 
       {lines.map((l, i) => {
         if (frame < l.at) return null;
-        const shown = l.instant
-          ? l.text
-          : l.text.slice(0, Math.floor((frame - l.at) * CPF));
-        const typing = !l.instant && shown.length < l.text.length;
+
+        if (l.kind === 'cmd') {
+          const n = Math.floor((frame - l.at) * cps);
+          const shown = l.text.slice(0, n);
+          const typing = shown.length < l.text.length;
+          return (
+            <div key={i} style={{color: INK, whiteSpace: 'pre'}}>
+              <span style={{color: VIOLET}}>PS&gt; </span>
+              {shown}
+              {typing || Math.floor(frame / 9) % 2 === 0 ? (
+                <span style={{color: VIOLET}}>▌</span>
+              ) : null}
+            </div>
+          );
+        }
+
+        if (l.kind === 'bar') {
+          const p = interpolate(frame, [l.at, l.at + l.frames], [0, 1], {
+            extrapolateLeft: 'clamp',
+            extrapolateRight: 'clamp',
+          });
+          const cells = 22;
+          const filled = Math.round(p * cells);
+          return (
+            <div key={i} style={{color: 'rgba(236,234,255,.8)', whiteSpace: 'pre'}}>
+              {'  '}
+              {l.text}{' '}
+              <span style={{color: GREEN}}>{'█'.repeat(filled)}</span>
+              <span style={{color: 'rgba(236,234,255,.22)'}}>{'░'.repeat(cells - filled)}</span>{' '}
+              {Math.round(p * 100)}%
+            </div>
+          );
+        }
+
+        // A result line slides up as it lands, so output feels like it arrives.
+        const a = interpolate(frame, [l.at, l.at + 5], [0, 1], {
+          extrapolateLeft: 'clamp',
+          extrapolateRight: 'clamp',
+        });
         return (
-          <div key={i} style={{color: l.colour ?? C.text, whiteSpace: 'pre'}}>
-            {shown}
-            {typing ? <span style={{color: C.accent}}>_</span> : null}
+          <div
+            key={i}
+            style={{
+              color: l.kind === 'ok' ? GREEN : 'rgba(236,234,255,.78)',
+              whiteSpace: 'pre',
+              opacity: a,
+              transform: `translateY(${(1 - a) * 8}px)`,
+            }}
+          >
+            {l.kind === 'ok' ? '  ✓ ' : '    '}
+            {l.text}
           </div>
         );
       })}

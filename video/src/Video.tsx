@@ -4,9 +4,21 @@ import '@fontsource/jetbrains-mono/500.css';
 import '@fontsource/jetbrains-mono/700.css';
 import '@fontsource/space-grotesk/500.css';
 import '@fontsource/space-grotesk/700.css';
-import {FPS, SCENES, VOICEOVER, VOICEOVER_DELAY_SECONDS, VOICEOVER_VOLUME} from './config';
+import {
+  FPS,
+  MUSIC_DUCK,
+  MUSIC_FADE_SECONDS,
+  MUSIC_FILE,
+  MUSIC_VOLUME,
+  SCENES,
+  TOTAL_FRAMES,
+  VOICEOVER,
+  VOICEOVER_DELAY_SECONDS,
+  VOICEOVER_VOLUME,
+} from './config';
 import {useScale} from './layout';
 import {Atmosphere, Floor, GROTESK, INK, MONO} from './design/world';
+import {Words} from './design/anim';
 import {SCENES_BY_ID} from './scenes/film';
 
 /**
@@ -25,6 +37,7 @@ const useActiveScene = () => {
   return SCENES.find((s) => t >= s.from && t < s.from + s.dur) ?? SCENES[SCENES.length - 1];
 };
 
+/** The caption arrives word by word, so the line itself is in motion. */
 const Caption: React.FC<{text: string}> = ({text}) => {
   const s = useScale();
   return (
@@ -43,7 +56,7 @@ const Caption: React.FC<{text: string}> = ({text}) => {
         textWrap: 'balance',
       }}
     >
-      {text}
+      <Words text={text} delay={3} per={1.7} />
     </div>
   );
 };
@@ -72,23 +85,63 @@ const Hud: React.FC<{seq: number; settled: boolean}> = ({seq, settled}) => {
   );
 };
 
+/**
+ * Music volume at a given frame: quiet under narration, up in the gaps,
+ * faded at both ends. The ramps are deliberately a few frames long, because
+ * an instant jump in level is audible as a click.
+ */
+const musicVolumeAt = (f: number) => {
+  const t = f / FPS;
+  const speaking = SCENES.some((s) => {
+    const start = s.from + VOICEOVER_DELAY_SECONDS;
+    return t > start - 0.35 && t < start + 5;
+  });
+  const target = speaking ? MUSIC_DUCK : MUSIC_VOLUME;
+  const fadeIn = Math.min(1, t / 1.2);
+  const fadeOut = Math.min(1, (TOTAL_FRAMES / FPS - t) / MUSIC_FADE_SECONDS);
+  return target * fadeIn * Math.max(0, fadeOut);
+};
+
 export const Video: React.FC = () => {
   const frame = useCurrentFrame();
   const active = useActiveScene();
 
-  // One camera for the whole film. It nearly stops wherever a screenshot has
-  // to be read, and drifts freely everywhere else.
-  const amp = active.settle ? 0.2 : 1;
-  const tx = Math.sin(frame / 92) * 14 * amp;
-  const ty = Math.cos(frame / 118) * 9 * amp;
-  const rot = Math.sin(frame / 165) * 0.65 * amp;
+  /*
+   * The camera does two things at once: a slow drift shared by the whole
+   * film, and a deliberate move across each scene (push in, pull back, or a
+   * pan). Scenes carrying a screenshot keep the move but at a fraction of the
+   * amplitude, so the picture stays readable while never being quite still.
+   */
+  const amp = active.settle ? 0.25 : 1;
+  const local = (frame - active.from * FPS) / (active.dur * FPS); // 0..1 through the scene
+  const ease = 0.5 - Math.cos(Math.min(1, Math.max(0, local)) * Math.PI) / 2;
+
+  const moves = {
+    push: {sx: 1 + ease * 0.09, mx: 0, my: -ease * 14},
+    pull: {sx: 1.055 - ease * 0.055, mx: 0, my: ease * 10},
+    panL: {sx: 1.05, mx: (0.5 - ease) * 150, my: 0},
+    panR: {sx: 1.05, mx: (ease - 0.5) * 150, my: 0},
+  } as const;
+  const mv = moves[active.cam];
+
+  const tx = Math.sin(frame / 92) * 12 * amp + mv.mx * (active.settle ? 0.45 : 1);
+  const ty = Math.cos(frame / 118) * 8 * amp + mv.my;
+  const rot = Math.sin(frame / 165) * 0.5 * amp;
+  const scale = 1 + (mv.sx - 1) * (active.settle ? 0.5 : 1);
 
   return (
     <AbsoluteFill style={{background: '#06040e'}}>
+      {MUSIC_FILE ? (
+        <Audio src={staticFile(MUSIC_FILE)} volume={(f) => musicVolumeAt(f)} />
+      ) : null}
       <Atmosphere />
       <Floor drift={(frame * (active.settle ? 0.5 : 1.4)) % 118} />
 
-      <AbsoluteFill style={{transform: `translate(${tx}px,${ty}px) rotate(${rot}deg)`}}>
+      <AbsoluteFill
+        style={{
+          transform: `translate(${tx}px,${ty}px) rotate(${rot}deg) scale(${scale})`,
+        }}
+      >
         {SCENES.map((scene) => {
           const Comp = SCENES_BY_ID[scene.id];
           return (

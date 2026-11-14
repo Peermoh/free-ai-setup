@@ -17,6 +17,8 @@ export type Scene = {
   caption: string;
   /** True on scenes carrying a screenshot: the camera nearly stops so it reads. */
   settle: boolean;
+  /** How the camera moves across this scene. */
+  cam: 'push' | 'pull' | 'panL' | 'panR';
 };
 
 /** Filled in by the owner. Shown in the final scene. */
@@ -48,8 +50,8 @@ export const FONT =
 export const SCENES = sceneTable as readonly Scene[];
 
 export type SceneId =
-  | 'hook' | 'places' | 'tiers' | 'laptop' | 'kaggle'
-  | 'router' | 'order' | 'privacy' | 'honest' | 'explore';
+  | 'hook' | 'flow' | 'install' | 'keys' | 'local'
+  | 'gpu' | 'order' | 'proof' | 'cta';
 
 /** Total length in seconds: 85 s, inside the 75-90 s target. */
 export const TOTAL_SECONDS = SCENES.reduce((a, s) => Math.max(a, s.from + s.dur), 0);
@@ -91,10 +93,13 @@ export const STATS = [
  * Set it back to null to render silent again. Use a track you are licensed
  * to use; do not commit music you do not have the rights to.
  */
-export const MUSIC_FILE: string | null = null;
+export const MUSIC_FILE: string | null = 'music.mp3';
 
 /** How loud the music sits under the video (0 = silent, 1 = full). */
-export const MUSIC_VOLUME = 0.18;
+export const MUSIC_VOLUME = 0.26;
+
+/** How far the music drops while a line of narration is playing. */
+export const MUSIC_DUCK = 0.11;
 
 /** Seconds of fade-out at the very end, so it does not cut off abruptly. */
 export const MUSIC_FADE_SECONDS = 2;

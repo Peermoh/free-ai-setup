@@ -1,12 +1,11 @@
 [
-  {"id": "hook",    "from": 0,  "dur": 5, "settle": false, "caption": "Where can an AI model actually run?"},
-  {"id": "places",  "from": 5,  "dur": 7, "settle": false, "caption": "Three places: someone else's server, your laptop, a borrowed GPU."},
-  {"id": "tiers",   "from": 12, "dur": 7, "settle": true,  "caption": "Cloud tiers are fast and free — until the daily limit."},
-  {"id": "laptop",  "from": 19, "dur": 5, "settle": false, "caption": "Your laptop has no limit, but it is slow."},
-  {"id": "kaggle",  "from": 24, "dur": 8, "settle": true,  "caption": "Kaggle lends you two GPUs, a few hours a week."},
-  {"id": "router",  "from": 32, "dur": 8, "settle": false, "caption": "So you do not pick one. You put a router in front."},
-  {"id": "order",   "from": 40, "dur": 10,"settle": true,  "caption": "It tries them in order. Out of quota? The next one answers."},
-  {"id": "privacy", "from": 50, "dur": 6, "settle": false, "caption": "Private or work questions skip the cloud entirely."},
-  {"id": "honest",  "from": 56, "dur": 6, "settle": true,  "caption": "None of this is new. Open tools, wired together."},
-  {"id": "explore", "from": 62, "dur": 5, "settle": true,  "caption": "Scripts and a guide, if you want to take it apart."}
+  {"id": "hook",    "from": 0,  "dur": 5,  "cam": "push",  "settle": false, "caption": "Run real AI on your own laptop. For free."},
+  {"id": "flow",    "from": 5,  "dur": 9,  "cam": "pull",  "settle": false, "caption": "One chat page. A router. Three places to run a model."},
+  {"id": "install", "from": 14, "dur": 8,  "cam": "push",  "settle": false, "caption": "Step one: one command installs everything."},
+  {"id": "keys",    "from": 22, "dur": 8,  "cam": "panL",  "settle": true,  "caption": "Step two: add free providers. The script shows every limit."},
+  {"id": "local",   "from": 30, "dur": 7,  "cam": "push",  "settle": false, "caption": "Step three: a model on your own machine. Nothing leaves it."},
+  {"id": "gpu",     "from": 37, "dur": 10, "cam": "panR",  "settle": true,  "caption": "Step four: borrow two free GPUs from Kaggle."},
+  {"id": "order",   "from": 47, "dur": 10, "cam": "push",  "settle": true,  "caption": "The router tries them in order. Out of quota? Next one answers."},
+  {"id": "proof",   "from": 57, "dur": 7,  "cam": "pull",  "settle": true,  "caption": "Six providers, fifteen models, one chat page."},
+  {"id": "cta",     "from": 64, "dur": 6,  "cam": "push",  "settle": false, "caption": "Want the scripts? Tell me in the comments."}
 ]
