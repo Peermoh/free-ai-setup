@@ -2,6 +2,7 @@ import React from 'react';
 import {Composition} from 'remotion';
 import {FPS, TOTAL_FRAMES} from './config';
 import {Video} from './Video';
+import {ThreeFilm} from './three/ThreeFilm';
 import {ThemePreview} from './preview/ThemePreview';
 import {Themes} from './preview/Themes';
 import {WireframeTheme} from './preview/Wireframe';
@@ -21,6 +22,14 @@ export const RemotionRoot: React.FC = () => (
       id="Portrait"
       component={Video}
       durationInFrames={TOTAL_FRAMES}
+      fps={FPS}
+      width={1080}
+      height={1920}
+    />
+    <Composition
+      id="Three"
+      component={ThreeFilm}
+      durationInFrames={24 * 30}
       fps={FPS}
       width={1080}
       height={1920}
