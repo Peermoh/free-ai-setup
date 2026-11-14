@@ -46,12 +46,12 @@ export const Narration: React.FC<{id: keyof typeof WORDS; delay: number; top?: n
       {words.map((w, i) => {
         const start = delay + Math.round(w.s * FPS);
         if (f < start - 1) return <span key={i} style={{opacity: 0}}>{clean(w.w)}</span>;
-        const p = bounce(f, start - 1, 260, 11);
+        const p = bounce(f, start - 1, 200, 16);
         const speaking = t >= w.s && t < Math.max(w.e, w.s + 0.18) + 0.08;
         const colour = COLOURS[(idx + i) % COLOURS.length];
         return (
           <span key={i} style={{display: 'inline-block', color: speaking ? colour : '#ffffff',
-            transform: `translateY(${(1 - p) * 40}px) scale(${(speaking ? 1.12 : 1) * Math.max(0, p)})`,
+            transform: `translateY(${(1 - p) * 10}px) scale(${(speaking ? 1.04 : 1) * (0.9 + 0.1 * Math.max(0, p))})`, opacity: Math.min(1, p * 2.5),
             textShadow: speaking ? `0 0 24px ${colour}aa, 0 6px 0 #00000088` : '0 6px 0 #00000088'}}>
             {clean(w.w)}
           </span>

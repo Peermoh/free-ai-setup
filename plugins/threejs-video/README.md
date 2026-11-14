@@ -7,6 +7,7 @@ Remotion — vertical 9:16 Shorts and Reels in particular.
 
 | Piece | Kind | What it does |
 |---|---|---|
+| `prompt-coach` | skill | Your own words → precise change list, sized, with the cheapest check first. |
 | `video-brief` | skill | Script → scene-by-scene brief → timed scene table. Use first. |
 | `threejs-scene` | skill | Rules and templates for Three.js inside Remotion: `ThreeCanvas`, frame-driven animation, isometric camera, 9:16 layout, labels and panels. |
 | `video-review` | skill | Render frame strips per scene and check them against hard rules. |
