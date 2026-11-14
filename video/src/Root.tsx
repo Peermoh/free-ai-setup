@@ -3,6 +3,7 @@ import {Composition} from 'remotion';
 import {FPS, TOTAL_FRAMES} from './config';
 import {Video} from './Video';
 import {ThemePreview} from './preview/ThemePreview';
+import {Themes} from './preview/Themes';
 
 /**
  * Two compositions, same scenes:
@@ -32,6 +33,14 @@ export const RemotionRoot: React.FC = () => (
       id="ThemePreview"
       component={ThemePreview}
       durationInFrames={120}
+      fps={FPS}
+      width={1080}
+      height={1080}
+    />
+    <Composition
+      id="Themes"
+      component={Themes}
+      durationInFrames={90}
       fps={FPS}
       width={1080}
       height={1080}
