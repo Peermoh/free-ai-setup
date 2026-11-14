@@ -1,10 +1,12 @@
 import React from 'react';
 import {interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
-import {ACCENT} from '../design/iso';
+import {ACCENT, useAccent} from '../design/iso';
+import {Shot} from '../components/Shot';
+import {ShotId} from '../shots';
 import {SceneId} from '../config';
 
 const MONO = '"JetBrains Mono", monospace';
-const GROTESK = '"Space Grotesk", sans-serif';
+const GROTESK = 'Sora, "Space Grotesk", sans-serif';
 const INK = '#eef2fb';
 
 /** A label pinned on the scene, arriving with a small pop. */
@@ -15,6 +17,7 @@ export const Chip: React.FC<{
   hot?: boolean;
   at?: number;
 }> = ({x, y, text, hot, at = 0}) => {
+  const A = useAccent();
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const p = spring({frame: frame - at, fps, config: {damping: 13}});
@@ -27,7 +30,7 @@ export const Chip: React.FC<{
         top: y,
         opacity: Math.min(1, p * 1.6),
         transform: `translateY(${(1 - p) * 16}px) scale(${0.88 + p * 0.12})`,
-        background: hot ? ACCENT : '#0a0f1b',
+        background: hot ? A : '#0a0f1b',
         color: hot ? '#140a02' : INK,
         border: hot ? 'none' : '1.4px solid rgba(255,255,255,.22)',
         borderRadius: 7,
@@ -59,6 +62,7 @@ export const Karaoke: React.FC<{
   hot?: string[];
   size?: number;
 }> = ({text, durationInFrames, hot = [], size = 40}) => {
+  const A = useAccent();
   const frame = useCurrentFrame();
   const words = text.split(' ');
 
@@ -133,7 +137,7 @@ export const Karaoke: React.FC<{
                 fontWeight: 700,
                 fontSize: size,
                 color: h ? '#140a02' : INK,
-                background: h ? ACCENT : 'transparent',
+                background: h ? A : 'transparent',
                 borderRadius: 6,
                 padding: h ? '2px 10px' : '2px 0',
                 opacity: t,
@@ -149,16 +153,19 @@ export const Karaoke: React.FC<{
   );
 };
 
-export const Segments: React.FC<{done: number; total: number}> = ({done, total}) => (
+export const Segments: React.FC<{done: number; total: number}> = ({done, total}) => {
+  const A = useAccent();
+  return (
   <div style={{position: 'absolute', right: 34, top: 32, display: 'flex', gap: 5}}>
     {Array.from({length: total}).map((_, i) => (
       <div
         key={i}
-        style={{width: 15, height: 13, background: i < done ? ACCENT : 'rgba(255,255,255,.18)'}}
+        style={{width: 15, height: 13, background: i < done ? A : 'rgba(255,255,255,.18)'}}
       />
     ))}
   </div>
-);
+  );
+};
 
 export const Source: React.FC<{text: string}> = ({text}) => (
   <div
@@ -200,10 +207,15 @@ export type Over = {
   chips: {x: number; y: number; text: string; hot?: boolean; at: number}[];
   /** The closing scene types a comment instead of showing a caption. */
   cta?: boolean;
+  /** This explanation's colour. */
+  accent: string;
+  /** A real screenshot sliding in over the stage. */
+  slide?: {id: ShotId; at: number; width: number; x: number; y: number};
 };
 
 export const OVERLAYS: Record<SceneId, Over> = {
   hook: {
+    accent: '#ff8a2b',
     source: 'AI · LOCAL',
     fine: 'SIMPLIFIED',
     hot: ['own'],
@@ -213,6 +225,7 @@ export const OVERLAYS: Record<SceneId, Over> = {
     ],
   },
   nogpu: {
+    accent: '#ff5d6c',
     source: 'AI · THE PROBLEM',
     fine: 'TYPICAL WORK LAPTOP',
     hot: ['GPU.'],
@@ -222,6 +235,7 @@ export const OVERLAYS: Record<SceneId, Over> = {
     ],
   },
   still: {
+    accent: '#4ade80',
     source: 'AI · STILL WORKS',
     fine: 'BIGGER MODEL NEEDS A GPU',
     hot: ['works.', 'powerful.'],
@@ -231,6 +245,7 @@ export const OVERLAYS: Record<SceneId, Over> = {
     ],
   },
   three: {
+    accent: '#a78bfa',
     source: 'AI · THE RECIPE',
     fine: 'SIMPLIFIED',
     hot: ['three'],
@@ -241,6 +256,7 @@ export const OVERLAYS: Record<SceneId, Over> = {
     ],
   },
   local: {
+    accent: '#34d399',
     source: 'AI · OLLAMA',
     fine: 'NOTHING LEAVES THE MACHINE',
     hot: ['Ollama.'],
@@ -248,8 +264,10 @@ export const OVERLAYS: Record<SceneId, Over> = {
       {x: 92, y: 260, text: 'llama3.2:3b', at: 16},
       {x: 620, y: 600, text: 'PRIVATE', hot: true, at: 50},
     ],
+    slide: {id: 'sync', at: 86, width: 600, x: 420, y: 600},
   },
   tiers: {
+    accent: '#ff8a2b',
     source: 'AI · FREE TIERS',
     fine: 'LIMITS AND DATA TERMS VARY',
     hot: ['Free'],
@@ -257,8 +275,10 @@ export const OVERLAYS: Record<SceneId, Over> = {
       {x: 90, y: 250, text: 'FREE TIER', hot: true, at: 20},
       {x: 650, y: 330, text: 'DAILY LIMIT', at: 62},
     ],
+    slide: {id: 'providerMenu', at: 96, width: 640, x: 380, y: 560},
   },
   gpu: {
+    accent: '#22d3ee',
     source: 'AI · KAGGLE',
     fine: 'FREE TIER · WEEKLY QUOTA',
     hot: ['two'],
@@ -266,8 +286,10 @@ export const OVERLAYS: Record<SceneId, Over> = {
       {x: 640, y: 280, text: '2 × TESLA T4', hot: true, at: 18},
       {x: 100, y: 700, text: 'HOURS PER WEEK', at: 50},
     ],
+    slide: {id: 'kaggleFlow', at: 84, width: 620, x: 400, y: 600},
   },
   route: {
+    accent: '#fbbf24',
     source: 'AI · THE ROUTER',
     fine: 'SIMPLIFIED',
     hot: ['router,'],
@@ -279,6 +301,7 @@ export const OVERLAYS: Record<SceneId, Over> = {
     ],
   },
   chat: {
+    accent: '#a78bfa',
     source: 'AI · OPEN WEBUI',
     fine: 'ONE PAGE, EVERY MODEL',
     hot: ['one'],
@@ -286,8 +309,10 @@ export const OVERLAYS: Record<SceneId, Over> = {
       {x: 110, y: 250, text: 'OPEN WEBUI', hot: true, at: 12},
       {x: 700, y: 230, text: 'THE ROUTER', at: 36},
     ],
+    slide: {id: 'models', at: 70, width: 600, x: 420, y: 560},
   },
   cta: {
+    accent: '#ff8a2b',
     source: 'AI · LOCAL',
     fine: 'SCRIPTS + GUIDE',
     hot: ['ai-local'],
@@ -298,6 +323,7 @@ export const OVERLAYS: Record<SceneId, Over> = {
 
 /** The closing card: a comment box that types the keyword. */
 export const CallToAction: React.FC = () => {
+  const A = useAccent();
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const p = spring({frame: frame - 4, fps, config: {damping: 15}});
@@ -325,7 +351,7 @@ export const CallToAction: React.FC = () => {
           padding: '16px 28px',
           borderRadius: '18px 18px 18px 5px',
           background: 'rgba(8,12,20,.95)',
-          border: `2px solid ${ACCENT}`,
+          border: `2px solid ${A}`,
           fontFamily: MONO,
           fontSize: 46,
           fontWeight: 700,
@@ -335,7 +361,7 @@ export const CallToAction: React.FC = () => {
         }}
       >
         {typed}
-        <span style={{color: ACCENT}}>{caret ? '▌' : '\u00A0'}</span>
+        <span style={{color: A}}>{caret ? '▌' : '\u00A0'}</span>
       </div>
       <div
         style={{
@@ -347,6 +373,52 @@ export const CallToAction: React.FC = () => {
         }}
       >
         COMMENT BELOW · I WILL SHARE THE GUIDE
+      </div>
+    </div>
+  );
+};
+
+/** A real screenshot sliding in from the right, over the illustration. */
+export const SlideShot: React.FC<{
+  id: ShotId;
+  at: number;
+  width: number;
+  x: number;
+  y: number;
+}> = ({id, at, width, x, y}) => {
+  const A = useAccent();
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const p = spring({frame: frame - at, fps, config: {damping: 18}});
+  if (p <= 0.001) return null;
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: x,
+        top: y,
+        opacity: Math.min(1, p * 1.4),
+        transform: `translateX(${(1 - p) * 260}px) rotate(${(1 - p) * 4}deg)`,
+      }}
+    >
+      <div style={{boxShadow: '0 30px 70px rgba(0,0,0,.7)', borderRadius: 14}}>
+        <Shot id={id} width={width} showLabel={false} />
+      </div>
+      <div
+        style={{
+          marginTop: 9,
+          display: 'inline-block',
+          background: A,
+          color: '#140a02',
+          fontFamily: MONO,
+          fontSize: 15,
+          fontWeight: 700,
+          letterSpacing: 1.6,
+          padding: '4px 10px',
+          borderRadius: 5,
+        }}
+      >
+        REAL SCREEN
       </div>
     </div>
   );

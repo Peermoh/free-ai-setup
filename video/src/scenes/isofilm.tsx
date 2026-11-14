@@ -12,6 +12,7 @@ import {
   Rack,
   Router,
   iso,
+  row,
 } from '../design/iso';
 import {SceneId} from '../config';
 
@@ -30,15 +31,37 @@ const useIn = (delay: number, damping = 16) => {
   return spring({frame: frame - delay, fps, config: {damping}});
 };
 
-/** Drops a prop in from above and settles it. */
-const Enter: React.FC<{delay: number; from?: number; children: React.ReactNode}> = ({
-  delay,
-  from = 150,
-  children,
-}) => {
+/**
+ * Entrances.
+ *
+ * Every prop dropping from above made the film feel like one trick repeated,
+ * so each scene now picks a different way in: from a side, growing from
+ * nothing, turning as it lands, or rising from the floor.
+ */
+type Way = 'drop' | 'left' | 'right' | 'grow' | 'spin' | 'rise';
+
+const Enter: React.FC<{
+  delay: number;
+  way?: Way;
+  amount?: number;
+  children: React.ReactNode;
+}> = ({delay, way = 'drop', amount = 160, children}) => {
   const p = useIn(delay);
+  const q = 1 - p;
+  const t =
+    way === 'drop'
+      ? `translate(0 ${-q * amount})`
+      : way === 'left'
+      ? `translate(${-q * amount} 0)`
+      : way === 'right'
+      ? `translate(${q * amount} 0)`
+      : way === 'rise'
+      ? `translate(0 ${q * amount})`
+      : way === 'grow'
+      ? `scale(${0.3 + p * 0.7})`
+      : `rotate(${q * 25}) scale(${0.55 + p * 0.45})`;
   return (
-    <g opacity={Math.min(1, p * 1.5)} transform={`translate(0 ${(1 - p) * -from})`}>
+    <g opacity={Math.min(1, p * 1.5)} transform={t}>
       {children}
     </g>
   );
@@ -54,10 +77,10 @@ const Hook: React.FC = () => {
   return (
     <>
       <IsoFloor drift={f * 0.5} />
-      <Enter delay={2}>
+      <Enter delay={2} way="grow">
         <Laptop x={-75} y={-50} />
       </Enter>
-      <Enter delay={34}>
+      <Enter delay={34} way="drop" amount={220}>
         <ModelCube x={-20} y={-150} lift={60 + Math.sin(f / 12) * 6} hot />
       </Enter>
     </>
@@ -70,7 +93,7 @@ const NoGpu: React.FC = () => {
   return (
     <>
       <IsoFloor drift={f * 0.5} />
-      <Enter delay={0}>
+      <Enter delay={0} way="left" amount={260}>
         <Laptop x={-150} y={-80} />
       </Enter>
       <g opacity={ramp(f, 26, 40)}>
@@ -86,17 +109,17 @@ const Still: React.FC = () => {
   return (
     <>
       <IsoFloor drift={f * 0.5} />
-      <Enter delay={0}>
+      <Enter delay={0} way="rise">
         <Laptop x={-190} y={-60} />
       </Enter>
       <Enter delay={20}>
         <ModelCube x={-140} y={-160} lift={56 + Math.sin(f / 11) * 5} hot />
       </Enter>
       {/* the bigger model turns up once a GPU is in the picture */}
-      <Enter delay={76}>
+      <Enter delay={76} way="right" amount={300}>
         <Gpu x={60} y={40} spin={f} />
       </Enter>
-      <Enter delay={94}>
+      <Enter delay={94} way="grow">
         <ModelCube x={110} y={-40} lift={70 + Math.sin(f / 9) * 7} hot />
       </Enter>
     </>
@@ -109,13 +132,13 @@ const Three: React.FC = () => {
   return (
     <>
       <IsoFloor drift={f * 0.5} />
-      <Enter delay={6}>
+      <Enter delay={6} way="left" amount={300}>
         <Laptop x={-230} y={120} />
       </Enter>
-      <Enter delay={26}>
+      <Enter delay={26} way="rise" amount={200}>
         <Rack x={-30} y={-30} lit label="FREE TIER" />
       </Enter>
-      <Enter delay={46}>
+      <Enter delay={46} way="right" amount={320}>
         <Gpu x={100} y={-190} spin={f} />
       </Enter>
     </>
@@ -128,10 +151,10 @@ const Local: React.FC = () => {
   return (
     <>
       <IsoFloor drift={f * 0.5} />
-      <Enter delay={0}>
+      <Enter delay={0} way="grow">
         <Laptop x={-150} y={-70} />
       </Enter>
-      <Enter delay={30}>
+      <Enter delay={30} way="spin">
         <ModelCube x={-100} y={-180} lift={64 + Math.sin(f / 10) * 6} hot />
       </Enter>
       {/* the answer comes back out of the machine, not from the network */}
@@ -154,7 +177,7 @@ const Tiers: React.FC = () => {
     <>
       <IsoFloor drift={f * 0.5} />
       {names.map((n, i) => (
-        <Enter key={n} delay={4 + i * 13}>
+        <Enter key={n} delay={4 + i * 13} way={i % 2 ? "left" : "right"} amount={240}>
           <Rack
             x={-180 + i * 95}
             y={180 - i * 95}
@@ -173,13 +196,13 @@ const Gpus: React.FC = () => {
   return (
     <>
       <IsoFloor drift={f * 0.5} />
-      <Enter delay={2}>
+      <Enter delay={2} way="left" amount={280}>
         <Gpu x={-130} y={-70} spin={f * 1.4} />
       </Enter>
-      <Enter delay={24}>
+      <Enter delay={24} way="right" amount={280}>
         <Gpu x={-40} y={60} spin={f * 1.7} />
       </Enter>
-      <Enter delay={52}>
+      <Enter delay={52} way="spin">
         <ModelCube x={10} y={-120} lift={60 + Math.sin(f / 9) * 8} hot />
       </Enter>
     </>
@@ -187,28 +210,61 @@ const Gpus: React.FC = () => {
 };
 
 /* ------------------------------------------------------------------ 8 */
+/**
+ * row(t, d) lands at screen (1.732 t, d): a clean horizontal row at height d.
+ * That makes a top-down architecture diagram straightforward in iso space.
+ */
+const SRC = [row(-140, -250), row(0, -250), row(140, -250)];
+const HUB = row(0, -10);
+const OUT = row(0, 215);
+
 const Route: React.FC = () => {
   const f = useCurrentFrame();
-  const P = (t: number) => ((f - 54) / 46 + t) % 1;
+  const packet = (o: number) => ((f - 70) / 44 + o) % 1;
   return (
     <>
       <IsoFloor drift={f * 0.5} />
-      <Enter delay={0}>
-        <Router x={-65} y={-45} pulse={f} />
+
+      {/* three sources across the top */}
+      <Enter delay={2} way="left" amount={260}>
+        <Laptop x={SRC[0].x - 70} y={SRC[0].y - 40} />
       </Enter>
-      <Enter delay={18}>
-        <Rack x={210} y={-230} lit label="FREE TIER" />
+      <Enter delay={14} way="drop" amount={240}>
+        <Rack x={SRC[1].x - 30} y={SRC[1].y - 30} lit label="FREE TIER" />
       </Enter>
-      <Enter delay={30}>
-        <Gpu x={120} y={150} spin={f} />
+      <Enter delay={26} way="right" amount={260}>
+        <Gpu x={SRC[2].x - 85} y={SRC[2].y - 40} spin={f} />
       </Enter>
-      <Enter delay={42}>
-        <Laptop x={-330} y={110} />
+
+      {/* the router under them */}
+      <Enter delay={40} way="grow">
+        <Router x={HUB.x - 65} y={HUB.y - 45} pulse={f} />
       </Enter>
-      {/* routes out of the router, drawn in turn, then carrying packets */}
-      <IsoRoute from={[0, 0, 34]} to={[240, -200, 40]} draw={ramp(f, 48, 62)} packets={f > 62 ? [P(0)] : []} />
-      <IsoRoute from={[0, 0, 34]} to={[170, 180, 22]} draw={ramp(f, 58, 72)} packets={f > 72 ? [P(0.33)] : []} />
-      <IsoRoute from={[0, 0, 34]} to={[-250, 150, 20]} draw={ramp(f, 68, 82)} packets={f > 82 ? [P(0.66)] : []} dash />
+
+      {/* each source wired into the router */}
+      {SRC.map((p, i) => (
+        <IsoRoute
+          key={i}
+          from={[p.x, p.y, 30]}
+          to={[HUB.x, HUB.y, 40]}
+          draw={ramp(f, 48 + i * 7, 64 + i * 7)}
+          packets={f > 70 ? [packet(i * 0.33)] : []}
+        />
+      ))}
+
+      {/* and the chat page under the router */}
+      <Enter delay={74} way="rise" amount={180}>
+        <g transform={`translate(${iso(OUT.x, OUT.y, 0)[0] - 115} ${iso(OUT.x, OUT.y, 0)[1] - 40})`}>
+          <ChatCard x={0} y={0} scale={1.05} />
+        </g>
+      </Enter>
+      <IsoRoute
+        from={[HUB.x, HUB.y, 10]}
+        to={[OUT.x, OUT.y, 40]}
+        draw={ramp(f, 80, 96)}
+        packets={f > 96 ? [packet(0.5)] : []}
+        colour={ACCENT}
+      />
     </>
   );
 };
@@ -219,19 +275,21 @@ const Chat: React.FC = () => {
   return (
     <>
       <IsoFloor drift={f * 0.5} />
-      <Enter delay={14}>
-        <Router x={60} y={-240} pulse={f} />
+      <Enter delay={0} way="drop" amount={200}>
+        <Router x={HUB.x - 65} y={HUB.y - 300} pulse={f} />
       </Enter>
       <IsoRoute
-        from={[120, -200, 34]}
-        to={[-40, 20, 60]}
-        draw={ramp(f, 34, 52)}
-        packets={f > 52 ? [((f - 52) / 40) % 1] : []}
+        from={[HUB.x, HUB.y - 255, 20]}
+        to={[OUT.x, OUT.y - 160, 40]}
+        draw={ramp(f, 20, 40)}
+        packets={f > 40 ? [((f - 40) / 36) % 1] : []}
         colour={ACCENT}
       />
-      <g opacity={Math.min(1, useIn(4) * 1.4)} transform="translate(-230 -60)">
-        <ChatCard x={0} y={0} scale={1.45} />
-      </g>
+      <Enter delay={10} way="grow">
+        <g transform={`translate(${iso(OUT.x, OUT.y - 160, 0)[0] - 165} ${iso(OUT.x, OUT.y - 160, 0)[1] - 60})`}>
+          <ChatCard x={0} y={0} scale={1.5} />
+        </g>
+      </Enter>
     </>
   );
 };

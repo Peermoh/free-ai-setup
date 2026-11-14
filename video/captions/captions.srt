@@ -1,39 +1,39 @@
 1
-00:00:00,000 --> 00:00:06,000
+00:00:00,000 --> 00:00:04,500
 You can build your own AI setup, on the laptop you already have.
 
 2
-00:00:06,000 --> 00:00:11,000
+00:00:04,500 --> 00:00:09,000
 Most of us don't have a powerful machine. No big GPU.
 
 3
-00:00:11,000 --> 00:00:17,000
+00:00:09,000 --> 00:00:15,000
 This still works. And if you do have a GPU, it gets seriously powerful.
 
 4
-00:00:17,000 --> 00:00:22,000
+00:00:15,000 --> 00:00:17,500
 It comes down to three things.
 
 5
-00:00:22,000 --> 00:00:29,000
+00:00:17,500 --> 00:00:22,000
 One. A model running on your own machine. That's Ollama.
 
 6
-00:00:29,000 --> 00:00:36,000
+00:00:22,000 --> 00:00:28,000
 Two. Free tiers from Groq, Gemini, NVIDIA and OpenRouter.
 
 7
-00:00:36,000 --> 00:00:43,000
+00:00:28,000 --> 00:00:32,500
 Three. A free GPU. Kaggle gives you two.
 
 8
-00:00:43,000 --> 00:00:49,000
+00:00:32,500 --> 00:00:38,000
 Now connect them. OmniRoute, an open source router, sits in front.
 
 9
-00:00:49,000 --> 00:00:55,000
+00:00:38,000 --> 00:00:42,500
 And Open WebUI gives you one chat page for all of it.
 
 10
-00:00:55,000 --> 00:01:00,000
+00:00:42,500 --> 00:00:46,500
 Comment ai-local and I'll share the scripts and the guide.

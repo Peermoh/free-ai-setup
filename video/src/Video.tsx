@@ -4,6 +4,9 @@ import '@fontsource/jetbrains-mono/500.css';
 import '@fontsource/jetbrains-mono/700.css';
 import '@fontsource/space-grotesk/500.css';
 import '@fontsource/space-grotesk/700.css';
+import '@fontsource/sora/500.css';
+import '@fontsource/sora/700.css';
+import '@fontsource/sora/800.css';
 import {
   FPS,
   MUSIC_DUCK,
@@ -17,9 +20,18 @@ import {
   VOICEOVER_VOLUME,
 } from './config';
 import {useScale} from './layout';
-import {ACCENT} from './design/iso';
+import {ACCENT, AccentCtx} from './design/iso';
 import {ISO_SCENES} from './scenes/isofilm';
-import {CallToAction, Chip, Fine, Karaoke, OVERLAYS, Segments, Source} from './scenes/overlay';
+import {
+  CallToAction,
+  Chip,
+  Fine,
+  Karaoke,
+  OVERLAYS,
+  Segments,
+  SlideShot,
+  Source,
+} from './scenes/overlay';
 
 /**
  * The film: isometric stages in a blue-black room, annotated with chips and
@@ -82,19 +94,42 @@ const SceneBlock: React.FC<{i: number}> = ({i}) => {
   const over = OVERLAYS[scene.id];
   const dur = scene.dur * FPS;
 
-  // The camera crosses the stage: a slow push, pull or pan, eased in and out.
+  /*
+   * Camera.
+   *
+   * Zoom and centre alone made every scene look framed from the same place,
+   * so each scene now has its own start and end viewpoint — a different
+   * zoom, a different part of the stage, and a slight roll — and the camera
+   * travels between them. Two neighbouring scenes never share a framing.
+   */
   const e = 0.5 - Math.cos(Math.min(1, Math.max(0, frame / dur)) * Math.PI) / 2;
-  const cam = {
-    push: {k: 1 + e * 0.17, dx: 0, dy: -e * 46},
-    pull: {k: 1.17 - e * 0.17, dx: 0, dy: e * 40},
-    panL: {k: 1.08, dx: (0.5 - e) * 230, dy: -e * 14},
-    panR: {k: 1.08, dx: (e - 0.5) * 230, dy: -e * 14},
-  }[scene.cam];
+  const VIEWS: Record<
+    string,
+    {a: [number, number, number, number]; b: [number, number, number, number]}
+  > = {
+    // [zoom, x, y, roll]
+    hook: {a: [0.86, 540, 430, -3], b: [1.22, 560, 470, 1]},
+    nogpu: {a: [1.3, 660, 520, 2], b: [0.95, 420, 450, -2]},
+    still: {a: [1.0, 430, 430, -1], b: [1.26, 640, 500, 3]},
+    three: {a: [1.35, 540, 520, 0], b: [0.8, 540, 420, -2]},
+    local: {a: [0.92, 480, 400, 2], b: [1.3, 600, 500, -1]},
+    tiers: {a: [1.22, 760, 470, -2], b: [1.0, 360, 440, 2]},
+    gpu: {a: [0.9, 430, 420, 3], b: [1.3, 620, 500, -2]},
+    route: {a: [1.25, 540, 560, -2], b: [0.78, 540, 430, 1]},
+    chat: {a: [0.85, 520, 420, 1], b: [1.18, 560, 480, -2]},
+    cta: {a: [1.3, 540, 500, -2], b: [0.92, 540, 420, 2]},
+  };
+  const v = VIEWS[scene.id] ?? VIEWS.hook;
+  const mix = (i: number) => v.a[i] + (v.b[i] - v.a[i]) * e;
+  const cam = {k: mix(0), dx: mix(1) - 540, dy: mix(2) - 470, roll: mix(3)};
 
   return (
+    <AccentCtx.Provider value={over.accent}>
     <Square>
       <svg width={1080} height={1080} style={{position: 'absolute', inset: 0}}>
-        <g transform={`translate(${540 + cam.dx} ${470 + cam.dy}) scale(${cam.k})`}>
+        <g
+          transform={`translate(${540 + cam.dx} ${470 + cam.dy}) rotate(${cam.roll}) scale(${cam.k})`}
+        >
           <Stage />
         </g>
       </svg>
@@ -109,8 +144,10 @@ const SceneBlock: React.FC<{i: number}> = ({i}) => {
       ) : (
         <Karaoke text={scene.caption} durationInFrames={dur} hot={over.hot} />
       )}
+      {over.slide ? <SlideShot {...over.slide} /> : null}
       <Fine text={over.fine} />
     </Square>
+    </AccentCtx.Provider>
   );
 };
 
@@ -153,13 +190,16 @@ export const Video: React.FC = () => (
 
 const Progress: React.FC = () => {
   const frame = useCurrentFrame();
+  const t = frame / FPS;
+  const active = SCENES.find((s) => t >= s.from && t < s.from + s.dur);
+  const colour = active ? OVERLAYS[active.id].accent : ACCENT;
   return (
     <div style={{position: 'absolute', left: 0, right: 0, bottom: 0, height: 4}}>
       <div
         style={{
           height: '100%',
           width: `${Math.min(100, (frame / TOTAL_FRAMES) * 100)}%`,
-          background: ACCENT,
+          background: colour,
           opacity: 0.9,
         }}
       />

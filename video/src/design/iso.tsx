@@ -1,5 +1,9 @@
 import React from 'react';
 
+/** Scene accent, so each explanation can carry its own colour. */
+export const AccentCtx = React.createContext('#ff7a1a');
+export const useAccent = () => React.useContext(AccentCtx);
+
 /**
  * Isometric props drawn as SVG polygons.
  *
@@ -138,7 +142,9 @@ export const Rack: React.FC<{x?: number; y?: number; lit?: boolean; label?: stri
   y = 0,
   lit,
   label,
-}) => (
+}) => {
+  const A = useAccent();
+  return (
   <g>
     <IsoShadow x={x} y={y} w={62} d={62} />
     <IsoBox
@@ -150,7 +156,7 @@ export const Rack: React.FC<{x?: number; y?: number; lit?: boolean; label?: stri
       shades={DARK}
       leftFace={({w, h}) => (
         <>
-          <rect x={6} y={8} width={w - 12} height={26} fill={lit ? ACCENT : '#46556f'} />
+          <rect x={6} y={8} width={w - 12} height={26} fill={lit ? A : '#46556f'} />
           {Array.from({length: 6}).map((_, i) => (
             <rect
               key={i}
@@ -177,7 +183,8 @@ export const Rack: React.FC<{x?: number; y?: number; lit?: boolean; label?: stri
       )}
     />
   </g>
-);
+  );
+};
 
 /** A laptop: thin base, screen leaning back. */
 export const Laptop: React.FC<{x?: number; y?: number}> = ({x = 0, y = 0}) => {
@@ -228,7 +235,9 @@ export const Gpu: React.FC<{x?: number; y?: number; spin?: number}> = ({
   x = 0,
   y = 0,
   spin = 0,
-}) => (
+}) => {
+  const A = useAccent();
+  return (
   <g>
     <IsoShadow x={x} y={y} w={175} d={80} />
     <IsoBox
@@ -243,7 +252,7 @@ export const Gpu: React.FC<{x?: number; y?: number; spin?: number}> = ({
           <rect x={0} y={0} width={w} height={d} fill="#222d40" />
           {[0.27, 0.72].map((f, i) => (
             <g key={i} transform={`translate(${w * f} ${d / 2})`}>
-              <circle r={26} fill="#161f2e" stroke={ACCENT} strokeWidth={2.5} />
+              <circle r={26} fill="#161f2e" stroke={A} strokeWidth={2.5} />
               <g transform={`rotate(${spin * (i ? -7 : 7)})`}>
                 {[0, 72, 144, 216, 288].map((a) => (
                   <rect
@@ -263,14 +272,17 @@ export const Gpu: React.FC<{x?: number; y?: number; spin?: number}> = ({
       )}
     />
   </g>
-);
+  );
+};
 
 /** The router: a small bright box with LEDs on top. */
 export const Router: React.FC<{x?: number; y?: number; pulse?: number}> = ({
   x = 0,
   y = 0,
   pulse = 0,
-}) => (
+}) => {
+  const A = useAccent();
+  return (
   <g>
     <IsoShadow x={x} y={y} w={130} d={95} />
     <IsoBox
@@ -279,32 +291,35 @@ export const Router: React.FC<{x?: number; y?: number; pulse?: number}> = ({
       w={130}
       d={95}
       h={34}
-      shades={{top: '#3a2410', left: ACCENT, right: '#b85a10'}}
+      shades={{top: '#3a2410', left: A, right: '#b85a10'}}
       topFace={({w, d}) => (
         <>
           <rect x={0} y={0} width={w} height={d} fill="#2a1a0c" />
-          <rect x={12} y={12} width={w - 24} height={7} rx={3.5} fill={ACCENT} />
+          <rect x={12} y={12} width={w - 24} height={7} rx={3.5} fill={A} />
           {Array.from({length: 5}).map((_, i) => (
             <circle
               key={i}
               cx={16 + i * 17}
               cy={d - 18}
               r={5}
-              fill={i <= (Math.floor(pulse / 8) % 5) ? ACCENT : 'rgba(255,255,255,.22)'}
+              fill={i <= (Math.floor(pulse / 8) % 5) ? A : 'rgba(255,255,255,.22)'}
             />
           ))}
         </>
       )}
     />
   </g>
-);
+  );
+};
 
 /** A floating chat window, drawn flat (it is a screen, not an object). */
 export const ChatCard: React.FC<{x: number; y: number; scale?: number}> = ({
   x,
   y,
   scale = 1,
-}) => (
+}) => {
+  const A = useAccent();
+  return (
   <g transform={`translate(${x} ${y}) scale(${scale})`}>
     <rect x={0} y={0} width={230} height={150} rx={10} fill="#121a2b" stroke="rgba(255,255,255,.16)" />
     <rect x={0} y={0} width={230} height={26} rx={10} fill="#1b2537" />
@@ -312,11 +327,12 @@ export const ChatCard: React.FC<{x: number; y: number; scale?: number}> = ({
       <circle key={i} cx={14 + i * 13} cy={13} r={4} fill={['#ff5f57', '#febc2e', '#28c840'][i]} />
     ))}
     <rect x={16} y={44} width={120} height={12} rx={6} fill="rgba(255,255,255,.2)" />
-    <rect x={80} y={66} width={134} height={12} rx={6} fill={ACCENT} opacity={0.85} />
+    <rect x={80} y={66} width={134} height={12} rx={6} fill={A} opacity={0.85} />
     <rect x={16} y={88} width={96} height={12} rx={6} fill="rgba(255,255,255,.2)" />
     <rect x={16} y={110} width={150} height={12} rx={6} fill="rgba(255,255,255,.12)" />
   </g>
-);
+  );
+};
 
 /* ------------------------------------------------------- motion pieces */
 
@@ -338,6 +354,7 @@ export const IsoRoute: React.FC<{
   colour?: string;
   dash?: boolean;
 }> = ({from, to, draw = 1, packets = [], colour = 'rgba(190,210,245,.55)', dash}) => {
+  const A = useAccent();
   const a = iso(...from);
   const b = iso(...to);
   const x2 = a[0] + (b[0] - a[0]) * draw;
@@ -349,7 +366,7 @@ export const IsoRoute: React.FC<{
         y1={a[1]}
         x2={x2}
         y2={y2}
-        stroke={colour}
+        stroke={colour ?? 'rgba(190,210,245,.55)'}
         strokeWidth={2}
         strokeDasharray={dash ? '7 7' : undefined}
       />
@@ -359,7 +376,7 @@ export const IsoRoute: React.FC<{
         const py = a[1] + (b[1] - a[1]) * t;
         return (
           <g key={i}>
-            <circle cx={px} cy={py} r={9} fill={ACCENT} opacity={0.28} />
+            <circle cx={px} cy={py} r={9} fill={A} opacity={0.28} />
             <circle cx={px} cy={py} r={4.2} fill="#fff" />
           </g>
         );
@@ -374,7 +391,9 @@ export const ModelCube: React.FC<{x?: number; y?: number; lift?: number; hot?: b
   y = 0,
   lift = 0,
   hot,
-}) => (
+}) => {
+  const A = useAccent();
+  return (
   <g>
     <IsoBox
       x={x}
@@ -385,12 +404,13 @@ export const ModelCube: React.FC<{x?: number; y?: number; lift?: number; hot?: b
       h={46}
       shades={
         hot
-          ? {top: '#ffb264', left: ACCENT, right: '#c05c10'}
+          ? {top: '#ffffff', left: A, right: 'rgba(0,0,0,.35)'}
           : {top: '#55678a', left: '#38465f', right: '#243043'}
       }
     />
   </g>
-);
+  );
+};
 
 /** A crossed-out slot: the GPU a cheap laptop does not have. */
 export const EmptySlot: React.FC<{x?: number; y?: number}> = ({x = 0, y = 0}) => {
@@ -414,3 +434,6 @@ export const EmptySlot: React.FC<{x?: number; y?: number}> = ({x = 0, y = 0}) =>
     </g>
   );
 };
+
+/** Position in a level row: +x and -y in equal measure moves right, flat. */
+export const row = (t: number, depth = 0) => ({x: depth + t, y: depth - t});
