@@ -11,7 +11,7 @@ import {Narration} from './Narration';
 export const SCENES = [
   {id: 'hook', s: 4.5}, {id: 'nogpu', s: 4.5}, {id: 'still', s: 6.0}, {id: 'three', s: 2.5},
   {id: 'local', s: 4.5}, {id: 'tiers', s: 6.0}, {id: 'gpu', s: 4.5}, {id: 'route', s: 5.5},
-  {id: 'chat', s: 4.5}, {id: 'cta', s: 4.5},
+  {id: 'chat', s: 4.5}, {id: 'flow', s: 6.8}, {id: 'cta', s: 4.5},
 ].map((x) => ({...x, dur: Math.round(x.s * FPS)}));
 
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
@@ -382,6 +382,122 @@ const Chat: React.FC<{dur: number}> = ({dur}) => {
   );
 };
 
+
+/* ---------- 8b · ONE QUESTION: how a request flows ---------- */
+type Pt = [number, number];
+const lerp = (a: Pt, b: Pt, t: number): Pt => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+/** Position along a list of timed hops; null before the first or after the last. */
+const along = (f: number, hops: {t0: number; t1: number; a: Pt; b: Pt}[]): Pt | null => {
+  for (const h of hops) {
+    if (f >= h.t0 && f <= h.t1) {
+      const t = (f - h.t0) / (h.t1 - h.t0);
+      return lerp(h.a, h.b, t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+    }
+  }
+  return null;
+};
+const Flow: React.FC<{dur: number}> = ({dur}) => {
+  const f = useCurrentFrame();
+  const out = exit(f, dur);
+  const CHAT: Pt = [540, 700], RT: Pt = [540, 790], RB: Pt = [540, 960];
+  const xs = [270, 540, 810];
+  const kinds = ['cube', 'cloud', 'gpu'] as const;
+  const names = ['LOCAL', 'FREE TIER', 'KAGGLE'];
+  const cols = [SKY, CORAL, SUN];
+  const BY = 1150;
+  const ask = at('flow', 'Ask'), omni = at('flow', 'OmniRoute'), free = at('flow', 'free');
+  const busy = at('flow', 'busy'), next = at('flow', 'next'), ans = at('flow', 'answers');
+  const req = along(f, [
+    {t0: ask + 12, t1: omni, a: CHAT, b: RT},
+    {t0: omni, t1: omni + 6, a: RT, b: RB},
+    {t0: omni + 6, t1: at('flow', 'sends'), a: RB, b: RB},
+    {t0: at('flow', 'sends'), t1: free + 4, a: RB, b: [540, BY - 90]},
+    {t0: free + 4, t1: busy + 2, a: [540, BY - 90], b: [540, BY - 90]},
+    {t0: busy + 2, t1: busy + 12, a: [540, BY - 90], b: RB},
+    {t0: busy + 12, t1: next - 4, a: RB, b: RB},
+    {t0: next - 4, t1: ans, a: RB, b: [810, BY - 90]},
+  ]);
+  const reply = along(f, [
+    {t0: ans + 2, t1: ans + 14, a: [810, BY - 90], b: RB},
+    {t0: ans + 14, t1: ans + 20, a: RB, b: RT},
+    {t0: ans + 20, t1: ans + 30, a: RT, b: CHAT},
+  ]);
+  const card = pop(f, 2, out, 180, 12);
+  const qb = bounce(f, ask, 240, 10);
+  const rb = bounce(f, ans + 30, 240, 10);
+  const r = pop(f, 6, out, 200, 10);
+  const isBusy = f >= busy;
+  const tag = bounce(f, busy, 260, 9);
+  const shake = isBusy ? Math.sin((f - busy) * 2.4) * 14 * Math.max(0, 1 - (f - busy) / 16) : 0;
+  const done = f >= ans;
+  return (
+    <AbsoluteFill>
+      <svg width={1080} height={1920}>
+        <g opacity={out}>
+          <path d="M540,705 L540,770" stroke={SOFT} strokeWidth={6} strokeDasharray="2 16" strokeLinecap="round" opacity={0.5} />
+          {xs.map((x) => (
+            <path key={x} d={`M540,965 L${x},${BY - 92}`} stroke={SOFT} strokeWidth={6} strokeDasharray="2 16" strokeLinecap="round" opacity={0.5} />
+          ))}
+        </g>
+        {/* the chat card */}
+        <g transform={`translate(540, 590) scale(${card.sx}, ${card.sy})`}>
+          <rect x={-380} y={-120} width={760} height={230} rx={40} fill="#f4f5ff" />
+          {f >= ask ? (
+            <g transform={`translate(330, -60) scale(${Math.max(0, qb)}) translate(-330, 60)`}>
+              <rect x={-20} y={-95} width={350} height={70} rx={35} fill={SKY} />
+              <text x={155} y={-49} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={30} fill="#fff">WHAT'S A GPU?</text>
+            </g>
+          ) : null}
+          {f >= ans + 30 ? (
+            <g transform={`translate(-330, 40) scale(${Math.max(0, rb)}) translate(330, -40)`}>
+              <rect x={-350} y={0} width={420} height={80} rx={34} fill="#fff" stroke="#dfe3f5" strokeWidth={4} />
+              <rect x={-322} y={22} width={300} height={14} rx={7} fill="#c3c8e4" />
+              <rect x={-322} y={46} width={200} height={14} rx={7} fill="#c3c8e4" />
+              <circle cx={40} cy={40} r={14} fill={SUN} />
+            </g>
+          ) : null}
+        </g>
+        {r.show ? (
+          <g transform={`translate(540, 820) scale(${r.sx}, ${r.sy})`}>
+            <Router blink={blinking(f, [100])} lights={f >= omni ? f / 4 : 0} />
+          </g>
+        ) : null}
+        {xs.map((x, i) => {
+          const p = pop(f, 10 + i * 4, out, 220, 11);
+          const mood = i === 1 && isBusy ? 'sad' : i === 2 && done ? 'wow' : 'happy';
+          return p.show ? (
+            <g key={x} transform={`translate(${x + (i === 1 ? shake : 0)}, ${BY}) scale(${0.95 * p.sx}, ${0.95 * p.sy})`} opacity={i === 1 && isBusy ? 0.55 : 1}>
+              <Badge kind={kinds[i]} mood={mood} />
+              <text y={140} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={32} fill={cols[i]}>{names[i]}</text>
+            </g>
+          ) : null;
+        })}
+        {isBusy ? (
+          <g transform={`translate(640, ${BY - 95}) scale(${Math.max(0, tag) * out}) rotate(-10)`}>
+            <rect x={-70} y={-30} width={140} height={60} rx={30} fill={CORAL} />
+            <text y={12} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={30} fill="#fff">BUSY</text>
+          </g>
+        ) : null}
+        {done ? <circle cx={810} cy={BY} r={110 + 10 * Math.sin(f / 3)} fill="none" stroke={MINT} strokeWidth={8} opacity={0.7 * out} /> : null}
+        {req ? (
+          <g>
+            <circle cx={req[0]} cy={req[1]} r={48 + 6 * Math.sin(f / 3)} fill={SKY} opacity={0.3} />
+            <circle cx={req[0]} cy={req[1]} r={28} fill={SKY} stroke="#fff" strokeWidth={5} />
+          </g>
+        ) : null}
+        {reply ? (
+          <g>
+            <circle cx={reply[0]} cy={reply[1]} r={48} fill={MINT} opacity={0.3} />
+            <circle cx={reply[0]} cy={reply[1]} r={28} fill={MINT} stroke="#fff" strokeWidth={5} />
+          </g>
+        ) : null}
+      </svg>
+      <Title frame={f} text="ONE QUESTION" sub="how a request flows" delay={2} out={out} />
+      <Narration id="flow" delay={VO_DELAY} />
+    </AbsoluteFill>
+  );
+};
+
 /* ---------- 9 · COMMENT AI-LOCAL ---------- */
 const Cta: React.FC<{dur: number}> = () => {
   const f = useCurrentFrame();
@@ -434,7 +550,7 @@ const Cta: React.FC<{dur: number}> = () => {
 
 const COMPONENTS: Record<string, React.FC<{dur: number}>> = {
   hook: Hook, nogpu: NoGpu, still: Still, three: Three, local: Local,
-  tiers: Tiers, gpu: GpuScene, route: Route, chat: Chat, cta: Cta,
+  tiers: Tiers, gpu: GpuScene, route: Route, chat: Chat, flow: Flow, cta: Cta,
 };
 
 export const FLAT_TOTAL = SCENES.reduce((a, s) => a + s.dur, 0);

@@ -54,14 +54,14 @@ export const Router: React.FC<{blink?: boolean; lights?: number}> = ({blink, lig
 );
 
 /** Small source icon on a coloured disc, for maps. */
-export const Badge: React.FC<{kind: 'cube' | 'cloud' | 'gpu'}> = ({kind}) => {
+export const Badge: React.FC<{kind: 'cube' | 'cloud' | 'gpu'; mood?: Mood}> = ({kind, mood = 'happy'}) => {
   const c = {cube: SKY, cloud: CORAL, gpu: SUN}[kind];
   return (
     <g>
       <circle r={86} fill={CARD} />
       <circle r={86} fill="none" stroke={c} strokeWidth={8} />
       <g transform="scale(0.55) translate(-120, -112)">
-        {kind === 'cube' ? <Cube /> : kind === 'cloud' ? <Cloud /> : <Gpu />}
+        {kind === 'cube' ? <Cube mood={mood} /> : kind === 'cloud' ? <Cloud mood={mood} /> : <Gpu mood={mood} />}
       </g>
     </g>
   );
