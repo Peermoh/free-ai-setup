@@ -174,3 +174,64 @@ export const CutFlash: React.FC = () => {
     </>
   );
 };
+
+/**
+ * A scene's text beats. Each item appears at `at` and leaves at `out`,
+ * animating both ways, so phrases hand over to each other instead of
+ * stacking up. This is what replaces a subtitle bar: short phrases that
+ * punctuate the narration rather than transcribe it.
+ */
+export const Beats: React.FC<{
+  items: {at: number; out?: number; node: React.ReactNode; x?: number; y?: number}[];
+}> = ({items}) => {
+  const frame = useCurrentFrame();
+  return (
+    <>
+      {items.map((it, i) => {
+        const inP = interpolate(frame, [it.at, it.at + 9], [0, 1], {
+          extrapolateLeft: 'clamp',
+          extrapolateRight: 'clamp',
+        });
+        const outP = it.out
+          ? interpolate(frame, [it.out, it.out + 8], [1, 0], {
+              extrapolateLeft: 'clamp',
+              extrapolateRight: 'clamp',
+            })
+          : 1;
+        const o = inP * outP;
+        if (o <= 0.002) return null;
+        return (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              left: it.x ?? 100,
+              top: it.y ?? 300,
+              opacity: o,
+              transform: `translateY(${(1 - inP) * 30 - (1 - outP) * 22}px)`,
+            }}
+          >
+            {it.node}
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
+/** A thin progress line, so a viewer can feel how much is left. */
+export const Progress: React.FC<{total: number; colour: string}> = ({total, colour}) => {
+  const frame = useCurrentFrame();
+  return (
+    <div style={{position: 'absolute', left: 0, right: 0, bottom: 0, height: 4}}>
+      <div
+        style={{
+          height: '100%',
+          width: `${Math.min(100, (frame / total) * 100)}%`,
+          background: colour,
+          opacity: 0.85,
+        }}
+      />
+    </div>
+  );
+};

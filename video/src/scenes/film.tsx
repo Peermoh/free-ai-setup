@@ -4,413 +4,500 @@ import {Shot} from '../components/Shot';
 import {Terminal, Line} from '../components/Terminal';
 import {Flow} from '../components/Flow';
 import {ShotStack} from '../components/ShotStack';
-import {DesignFrame, GREEN, GROTESK, INK, Links, MONO, Node, P3, project, VIOLET} from '../design/world';
-import {Fill, Framed, Marked, Measure, Outline, Tag} from '../design/type';
-import {CutFlash, Pop, Rise, ShotIn, useCount, useIn, Wipe} from '../design/anim';
+import {GREEN, GROTESK, INK, MONO, VIOLET} from '../design/world';
+import {Fill, Marked, Measure, Outline, Tag} from '../design/type';
+import {Beats, Pop, Rise, ShotIn, useCount, Wipe} from '../design/anim';
 import {SceneId} from '../config';
 
 /**
- * The nine scenes of the how-to. Every scene is a list of beats: something
- * arrives roughly every second, so nothing ever sits still long enough to
- * read as a slide.
+ * The ten explanations.
  *
- * Authored inside <DesignFrame>, i.e. a 1080 square, so no scale factors.
+ * There is no subtitle bar: the words on screen are the animation. Each scene
+ * is a short sequence of phrases that punctuate the narration, timed so one
+ * hands over to the next, with the visual arriving underneath.
+ *
+ * Authored in a 1080 square via <DesignFrame> in Video.tsx.
  */
 
-const ROUTER: P3 = {x: 0, y: 30, z: 60};
-const NODES: {p: P3; label: string; sub: string}[] = [
-  {p: {x: -300, y: -200, z: 420}, label: 'Groq', sub: 'free tier'},
-  {p: {x: 300, y: -240, z: 500}, label: 'Gemini', sub: 'free tier'},
-  {p: {x: -430, y: 80, z: 760}, label: 'NVIDIA', sub: 'free trial'},
-  {p: {x: 430, y: 55, z: 820}, label: 'OpenRouter', sub: 'free + paid'},
-  {p: {x: -250, y: 320, z: 1150}, label: 'Kaggle', sub: 'borrowed GPU'},
-  {p: {x: 270, y: 340, z: 1250}, label: 'your laptop', sub: 'private, last'},
-];
+const L = 96; // left margin for text blocks
 
-/** A step badge in the corner of a how-to scene. */
-const Step: React.FC<{n: number; of?: number; label: string}> = ({n, of = 4, label}) => (
-  <Rise delay={2} y={-14}>
-    <div style={{display: 'flex', alignItems: 'center', gap: 14}}>
-      <div
-        style={{
-          fontFamily: GROTESK,
-          fontWeight: 700,
-          fontSize: 44,
-          color: '#06040e',
-          background: VIOLET,
-          borderRadius: 10,
-          padding: '2px 16px',
-        }}
-      >
-        {n}
-      </div>
-      <div style={{fontFamily: MONO, fontSize: 19, letterSpacing: 3, color: 'rgba(236,234,255,.55)'}}>
-        {`STEP ${n} OF ${of} · ${label}`}
-      </div>
-    </div>
-  </Rise>
+const Lead: React.FC<{children: React.ReactNode}> = ({children}) => (
+  <div style={{fontFamily: MONO, fontSize: 20, letterSpacing: 5, color: '#c3a4ff'}}>
+    {children}
+  </div>
+);
+
+const Sub: React.FC<{children: React.ReactNode}> = ({children}) => (
+  <div style={{fontFamily: MONO, fontSize: 30, color: 'rgba(236,234,255,.72)', marginTop: 14}}>
+    {children}
+  </div>
 );
 
 const Centre: React.FC<{children: React.ReactNode; bottom?: number}> = ({
   children,
-  bottom = 190,
+  bottom = 110,
 }) => (
-  <AbsoluteFill style={{alignItems: 'center', justifyContent: 'center'}}>
+  <AbsoluteFill style={{alignItems: 'center', justifyContent: 'flex-end'}}>
     <div style={{paddingBottom: bottom}}>{children}</div>
   </AbsoluteFill>
 );
 
 /* ------------------------------------------------------------------ hook */
 const Hook: React.FC = () => (
-  <DesignFrame>
-    <CutFlash />
-    <div style={{position: 'absolute', left: 100, top: 290}}>
-      <Rise delay={0} y={30}>
-        <div style={{fontFamily: MONO, fontSize: 19, letterSpacing: 5, color: '#c3a4ff'}}>
-          [ HOW TO BUILD IT ]
-        </div>
-      </Rise>
-      <div style={{lineHeight: 0.98, marginTop: 18}}>
-        <Rise delay={6} y={34}>
-          <Outline size={100}>RUN REAL AI</Outline>
-        </Rise>
-        <Rise delay={14} y={34}>
-          <Fill size={100}>ON YOUR LAPTOP</Fill>
-        </Rise>
-        <div style={{marginTop: 22}}>
-          <Wipe delay={26}>
-            <Marked size={100}>FOR FREE</Marked>
-          </Wipe>
-        </div>
-      </div>
-      <div style={{marginTop: 30, display: 'flex', gap: 10}}>
-        {['FREE TIERS', 'LOCAL MODEL', 'FREE GPU'].map((t, i) => (
-          <Pop key={t} delay={38 + i * 6}>
-            <Tag>{t}</Tag>
-          </Pop>
-        ))}
-      </div>
-    </div>
-  </DesignFrame>
+  <Beats
+    items={[
+      {
+        at: 0,
+        node: (
+          <>
+            <Lead>[ HOW TO BUILD IT ]</Lead>
+            <div style={{marginTop: 16, lineHeight: 0.98}}>
+              <Outline size={104}>BUILD YOUR</Outline>
+              <div>
+                <Fill size={104}>OWN AI</Fill>
+              </div>
+            </div>
+          </>
+        ),
+        x: L,
+        y: 270,
+      },
+      {
+        at: 44,
+        node: (
+          <Marked size={54}>ON THE LAPTOP YOU ALREADY HAVE</Marked>
+        ),
+        x: L,
+        y: 520,
+      },
+      {
+        at: 96,
+        node: (
+          <div style={{display: 'flex', gap: 10}}>
+            {['FREE TIERS', 'LOCAL MODEL', 'FREE GPU'].map((t, i) => (
+              <Pop key={t} delay={96 + i * 7}>
+                <Tag>{t}</Tag>
+              </Pop>
+            ))}
+          </div>
+        ),
+        x: L,
+        y: 620,
+      },
+    ]}
+  />
 );
 
-/* ------------------------------------------------------------------ flow */
-const FlowScene: React.FC = () => (
-  <DesignFrame>
-    <CutFlash />
-    <div style={{position: 'absolute', left: 100, top: 110}}>
-      <Step n={0} of={4} label="WHAT YOU END UP WITH" />
-    </div>
-    <div style={{position: 'absolute', left: 80, top: 215}}>
-      <Flow
-        width={920}
-        height={640}
-        boxes={[
-          {id: 'chat', label: 'Open WebUI', sub: 'one chat page', x: 460, y: 60, at: 6},
-          {id: 'router', label: 'OmniRoute', sub: 'the router', x: 460, y: 250, at: 30, tone: 'router'},
-          {id: 'free', label: 'Free tiers', sub: 'Groq · Gemini · NVIDIA', x: 195, y: 470, w: 280, at: 58},
-          {id: 'local', label: 'Your laptop', sub: 'Ollama, private', x: 460, y: 560, w: 260, at: 76, tone: 'green'},
-          {id: 'gpu', label: 'Kaggle GPU', sub: '2 × T4, free', x: 725, y: 470, w: 262, at: 94},
-        ]}
-        arrows={[
-          {from: 'chat', to: 'router', at: 22},
-          {from: 'router', to: 'free', at: 50},
-          {from: 'router', to: 'local', at: 68},
-          {from: 'router', to: 'gpu', at: 86},
-        ]}
-      />
-    </div>
-  </DesignFrame>
-);
-
-/* --------------------------------------------------------------- install */
-const INSTALL: Line[] = [
-  {at: 4, kind: 'cmd', text: '.\\setup-ai.ps1 -Install'},
-  {at: 36, kind: 'bar', text: 'installing  ', frames: 62},
-  {at: 100, kind: 'ok', text: 'Ollama'},
-  {at: 110, kind: 'ok', text: 'Node.js  ·  Python 3.11'},
-  {at: 120, kind: 'ok', text: 'OmniRoute'},
-  {at: 130, kind: 'ok', text: 'Open WebUI'},
-  {at: 146, kind: 'cmd', text: '.\\setup-ai.ps1 -Configure'},
-  {at: 186, kind: 'ok', text: 'All done. Refresh Open WebUI.'},
-];
-
-const Install: React.FC = () => (
+/* ----------------------------------------------------------------- nogpu */
+const NoGpu: React.FC = () => (
   <>
-    <DesignFrame>
-      <CutFlash />
-      <div style={{position: 'absolute', left: 100, top: 130}}>
-        <Step n={1} of={4} label="INSTALL" />
-      </div>
-    </DesignFrame>
+    <Beats
+      items={[
+        {
+          at: 0,
+          node: (
+            <div style={{lineHeight: 0.98}}>
+              <Outline size={112}>NO BIG</Outline>
+              <div>
+                <Fill size={112}>GPU?</Fill>
+              </div>
+            </div>
+          ),
+          x: L,
+          y: 300,
+        },
+        {
+          at: 46,
+          node: <Sub>most laptops don&apos;t have one</Sub>,
+          x: L,
+          y: 540,
+        },
+      ]}
+    />
     <Centre bottom={150}>
-      <Rise delay={2} y={40}>
-        <Terminal lines={INSTALL} width={880} />
+      <Rise delay={70} y={40}>
+        <div style={{display: 'flex', gap: 12}}>
+          {['8–16 GB RAM', 'NO DEDICATED GPU', 'WINDOWS LAPTOP'].map((t) => (
+            <Tag key={t}>{t}</Tag>
+          ))}
+        </div>
       </Rise>
     </Centre>
   </>
 );
 
-/* ------------------------------------------------------------------ keys */
-const Keys: React.FC = () => (
-  <>
-    <DesignFrame>
-      <CutFlash />
-      <div style={{position: 'absolute', left: 100, top: 130}}>
-        <Step n={2} of={4} label="FREE PROVIDERS" />
-      </div>
-      <div style={{position: 'absolute', left: 100, top: 232, display: 'flex', gap: 10}}>
-        {['FREE', 'FREE TRIAL', 'FREE + PAID', 'CHECK'].map((t, i) => (
-          <Pop key={t} delay={20 + i * 7}>
-            <Tag>{t}</Tag>
-          </Pop>
+/* ----------------------------------------------------------------- still */
+const Still: React.FC = () => (
+  <Beats
+    items={[
+      {
+        at: 0,
+        out: 74,
+        node: (
+          <div style={{lineHeight: 0.98}}>
+            <Fill size={116}>IT STILL</Fill>
+            <div>
+              <Marked size={116}>WORKS</Marked>
+            </div>
+          </div>
+        ),
+        x: L,
+        y: 330,
+      },
+      {
+        at: 84,
+        node: (
+          <div style={{lineHeight: 0.98}}>
+            <Outline size={96}>GOT A GPU?</Outline>
+            <div style={{marginTop: 20}}>
+              <Wipe delay={110}>
+                <Marked size={96}>EVEN BETTER</Marked>
+              </Wipe>
+            </div>
+            <Rise delay={128}>
+              <Sub>run a much bigger open model, locally</Sub>
+            </Rise>
+          </div>
+        ),
+        x: L,
+        y: 300,
+      },
+    ]}
+  />
+);
+
+/* ----------------------------------------------------------------- three */
+const Three: React.FC = () => {
+  const items = [
+    {n: '1', t: 'LOCAL MODEL', at: 28},
+    {n: '2', t: 'FREE TIERS', at: 46},
+    {n: '3', t: 'FREE GPU', at: 64},
+  ];
+  return (
+    <>
+      <Beats
+        items={[
+          {
+            at: 0,
+            node: (
+              <div style={{lineHeight: 0.98}}>
+                <Outline size={110}>THREE</Outline>{'\u2002'}
+                <Fill size={110}>THINGS</Fill>
+              </div>
+            ),
+            x: L,
+            y: 250,
+          },
+        ]}
+      />
+      <div style={{position: 'absolute', left: L, top: 430}}>
+        {items.map((it) => (
+          <Rise key={it.n} delay={it.at} y={26}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 22,
+                borderTop: '1.4px solid rgba(190,165,255,.3)',
+                padding: '16px 0',
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: GROTESK,
+                  fontWeight: 700,
+                  fontSize: 64,
+                  color: '#06040e',
+                  background: VIOLET,
+                  borderRadius: 12,
+                  padding: '0 20px',
+                }}
+              >
+                {it.n}
+              </div>
+              <div style={{fontFamily: GROTESK, fontWeight: 700, fontSize: 56, color: INK}}>
+                {it.t}
+              </div>
+            </div>
+          </Rise>
         ))}
       </div>
-    </DesignFrame>
-    <Centre bottom={130}>
-      <ShotIn delay={46}>
+    </>
+  );
+};
+
+/* ----------------------------------------------------------------- local */
+const LOCAL_LINES: Line[] = [
+  {at: 58, kind: 'cmd', text: 'ollama run llama3.2:3b'},
+  {at: 104, kind: 'out', text: 'thinking...'},
+  {at: 126, kind: 'ok', text: 'answered on your own machine'},
+];
+
+const Local: React.FC = () => (
+  <>
+    <Beats
+      items={[
+        {
+          at: 0,
+          node: (
+            <>
+              <Lead>[ 1 OF 3 ]</Lead>
+              <div style={{marginTop: 14, lineHeight: 0.98}}>
+                <Outline size={100}>A MODEL ON</Outline>
+                <div>
+                  <Fill size={100}>YOUR MACHINE</Fill>
+                </div>
+              </div>
+            </>
+          ),
+          x: L,
+          y: 190,
+        },
+        {at: 38, node: <Marked size={58}>OLLAMA</Marked>, x: L, y: 440},
+      ]}
+    />
+    <Centre bottom={120}>
+      <Rise delay={50} y={42}>
+        <Terminal lines={LOCAL_LINES} width={800} title="PowerShell · local" />
+      </Rise>
+    </Centre>
+  </>
+);
+
+/* ----------------------------------------------------------------- tiers */
+const PROVIDERS = ['GROQ', 'GEMINI', 'NVIDIA', 'OPENROUTER'];
+
+const Tiers: React.FC = () => (
+  <>
+    <Beats
+      items={[
+        {
+          at: 0,
+          node: (
+            <>
+              <Lead>[ 2 OF 3 ]</Lead>
+              <div style={{marginTop: 14, lineHeight: 0.98}}>
+                <Outline size={100}>FREE TIERS,</Outline>
+                <div>
+                  <Fill size={100}>FOUR OF THEM</Fill>
+                </div>
+              </div>
+            </>
+          ),
+          x: L,
+          y: 165,
+        },
+      ]}
+    />
+    <div style={{position: 'absolute', left: L, top: 415, display: 'flex', gap: 12}}>
+      {PROVIDERS.map((p, i) => (
+        <Pop key={p} delay={34 + i * 11}>
+          <div
+            style={{
+              fontFamily: GROTESK,
+              fontWeight: 700,
+              fontSize: 34,
+              color: INK,
+              border: `1.8px solid ${VIOLET}`,
+              borderRadius: 10,
+              padding: '8px 16px',
+              background: 'rgba(10,8,22,.7)',
+            }}
+          >
+            {p}
+          </div>
+        </Pop>
+      ))}
+    </div>
+    <Centre bottom={105}>
+      <ShotIn delay={92}>
         <Shot id="providerMenu" width={880} showLabel={false} />
       </ShotIn>
     </Centre>
   </>
 );
 
-/* ----------------------------------------------------------------- local */
-const LOCAL: Line[] = [
-  {at: 50, kind: 'cmd', text: 'ollama run llama3.2:3b'},
-  {at: 92, kind: 'out', text: 'thinking...'},
-  {at: 112, kind: 'ok', text: 'answered on your own machine'},
-];
-
-const Local: React.FC = () => (
-  <>
-    <DesignFrame>
-      <CutFlash />
-      <div style={{position: 'absolute', left: 100, top: 130}}>
-        <Step n={3} of={4} label="A MODEL ON YOUR MACHINE" />
-      </div>
-      <Node
-        p={{x: 0, y: -120, z: 150}}
-        label="your laptop"
-        sub="llama3.2:3b"
-        tone="open"
-        state="PRIVATE"
+/* ------------------------------------------------------------------- gpu */
+const Gpu: React.FC = () => {
+  const n = useCount(2, 22, 18);
+  return (
+    <>
+      <Beats
+        items={[
+          {
+            at: 0,
+            node: (
+              <>
+                <Lead>[ 3 OF 3 ]</Lead>
+                <div style={{marginTop: 14, lineHeight: 0.98}}>
+                  <Outline size={100}>A FREE GPU,</Outline>
+                  <div>
+                    <Fill size={100}>FROM KAGGLE</Fill>
+                  </div>
+                </div>
+              </>
+            ),
+            x: L,
+            y: 150,
+          },
+        ]}
       />
-    </DesignFrame>
-    <Centre bottom={140}>
-      <Rise delay={40} y={40}>
-        <Terminal lines={LOCAL} width={760} title="PowerShell · local" />
-      </Rise>
-    </Centre>
+      <div style={{position: 'absolute', left: L, top: 400}}>
+        <div style={{display: 'flex', alignItems: 'baseline', gap: 18}}>
+          <div
+            style={{
+              fontFamily: GROTESK,
+              fontWeight: 700,
+              fontSize: 104,
+              color: GREEN,
+              letterSpacing: -4,
+            }}
+          >
+            {n}×
+          </div>
+          <Rise delay={40}>
+            <div style={{fontFamily: GROTESK, fontWeight: 700, fontSize: 56, color: INK}}>
+              TESLA T4
+            </div>
+          </Rise>
+        </div>
+        <Rise delay={52}>
+          <div style={{marginTop: 10}}>
+            <Measure width={540} label="FREE · HOURS PER WEEK · FIXED ADDRESS" />
+          </div>
+        </Rise>
+      </div>
+      <Centre bottom={95}>
+        <ShotStack
+          items={[
+            {id: 'gpus', at: 64, width: 520, rot: -2.5, dx: -160, dy: -150},
+            {id: 'kaggleFlow', at: 92, width: 800, rot: 1.4, dx: 10, dy: 60},
+          ]}
+        />
+      </Centre>
+    </>
+  );
+};
+
+/* ----------------------------------------------------------------- route */
+const Route: React.FC = () => (
+  <>
+    <Beats
+      items={[
+        {
+          at: 0,
+          node: (
+            <>
+              <Marked size={76}>OMNIROUTE</Marked>
+              <Sub>an open-source router, in front of all three</Sub>
+            </>
+          ),
+          x: L,
+          y: 150,
+        },
+      ]}
+    />
+    <div style={{position: 'absolute', left: 80, top: 330}}>
+      <Flow
+        width={920}
+        height={560}
+        boxes={[
+          {id: 'router', label: 'OmniRoute', sub: 'the router', x: 460, y: 60, at: 10, tone: 'router'},
+          {id: 'free', label: 'Free tiers', sub: 'Groq · Gemini · NVIDIA', x: 190, y: 300, w: 280, at: 44},
+          {id: 'local', label: 'Your laptop', sub: 'Ollama', x: 460, y: 400, w: 250, at: 62, tone: 'green'},
+          {id: 'gpu', label: 'Kaggle GPU', sub: '2 × T4', x: 730, y: 300, w: 250, at: 80},
+        ]}
+        arrows={[
+          {from: 'router', to: 'free', at: 36},
+          {from: 'router', to: 'local', at: 54},
+          {from: 'router', to: 'gpu', at: 72},
+        ]}
+      />
+    </div>
   </>
 );
 
-/* ------------------------------------------------------------------- gpu */
-const Gpu: React.FC = () => {
-  const n = useCount(2, 14, 20);
-  return (
-    <>
-      <DesignFrame>
-        <CutFlash />
-        <div style={{position: 'absolute', left: 100, top: 120}}>
-          <Step n={4} of={4} label="BORROW A GPU" />
-        </div>
-        <div style={{position: 'absolute', left: 100, top: 212}}>
-          <div style={{display: 'flex', alignItems: 'baseline', gap: 20}}>
-            <div
-              style={{
-                fontFamily: GROTESK,
-                fontWeight: 700,
-                fontSize: 120,
-                color: INK,
-                letterSpacing: -4,
-              }}
-            >
-              {n}×
-            </div>
-            <Rise delay={30}>
-              <div style={{fontFamily: GROTESK, fontWeight: 700, fontSize: 60, color: GREEN}}>
-                TESLA T4
-              </div>
-            </Rise>
-          </div>
-          <Rise delay={40}>
-            <Measure width={560} label="FREE · HOURS PER WEEK · FIXED ADDRESS" />
-          </Rise>
-        </div>
-      </DesignFrame>
-      <Centre bottom={125}>
-        <ShotStack
-          items={[
-            {id: 'gpus', at: 58, width: 620, rot: -2.5, dx: -40, dy: -110},
-            {id: 'kaggleFlow', at: 86, width: 820, rot: 1.6, dx: 20, dy: 70},
-          ]}
-        />
-      </Centre>
-    </>
-  );
-};
-
-/* ----------------------------------------------------------------- order */
-const Order: React.FC = () => {
-  const frame = useCurrentFrame();
-  const t = interpolate(frame, [52, 122], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-  const a = project(ROUTER);
-  const b = project(NODES[1].p);
-  const out = frame > 40;
-  const answered = frame > 124;
-
-  return (
-    <>
-      <DesignFrame>
-        <CutFlash />
-        <Links from={ROUTER} to={NODES.map((n) => n.p)} highlight={1} dim />
-        {NODES.map((nd, i) => (
-          <div key={nd.label} style={{opacity: useIn(4 + i * 4)}}>
-            <Node
-              p={nd.p}
-              label={nd.label}
-              sub={nd.sub}
-              tone={i === 0 && out ? 'closed' : i === 1 && answered ? 'open' : 'ink'}
-              state={i === 0 && out ? 'OUT OF QUOTA' : i === 1 && answered ? 'ANSWERED' : undefined}
-            />
-          </div>
-        ))}
-        <Node p={ROUTER} label="OmniRoute" tone="router" />
-        <div
-          style={{
-            position: 'absolute',
-            left: a.x + (b.x - a.x) * t,
-            top: a.y + (b.y - a.y) * t,
-            width: 16,
-            height: 16,
-            marginLeft: -8,
-            marginTop: -8,
-            borderRadius: 999,
-            background: '#fff',
-            boxShadow: `0 0 30px 8px ${VIOLET}`,
-            opacity: frame > 48 ? 1 : 0,
-          }}
-        />
-      </DesignFrame>
-      <Centre bottom={120}>
-        <ShotIn delay={150}>
-          <Shot id="combos" width={900} showLabel={false} />
-        </ShotIn>
-      </Centre>
-    </>
-  );
-};
-
-/* ----------------------------------------------------------------- proof */
-const Proof: React.FC = () => {
-  const p = useCount(6, 8, 18);
-  const m = useCount(15, 20, 22);
-  return (
-    <>
-      <DesignFrame>
-        <CutFlash />
-        <div style={{position: 'absolute', left: 0, right: 0, top: 120, textAlign: 'center'}}>
-          <div style={{display: 'flex', justifyContent: 'center', gap: 70}}>
-            {[
-              {n: p, u: 'providers'},
-              {n: m, u: 'models'},
-              {n: 1, u: 'chat page'},
-            ].map((s) => (
-              <div key={s.u}>
-                <div
-                  style={{
-                    fontFamily: GROTESK,
-                    fontWeight: 700,
-                    fontSize: 96,
-                    color: INK,
-                    letterSpacing: -3,
-                  }}
-                >
-                  {s.n}
-                </div>
-                <div
-                  style={{
-                    fontFamily: MONO,
-                    fontSize: 22,
-                    letterSpacing: 3,
-                    color: 'rgba(236,234,255,.55)',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {s.u}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </DesignFrame>
-      <Centre bottom={120}>
-        <ShotStack
-          items={[
-            {id: 'sync', at: 34, width: 700, rot: -3, dx: -60, dy: -60},
-            {id: 'models', at: 58, width: 760, rot: 2.2, dx: 40, dy: 40},
-          ]}
-        />
-      </Centre>
-    </>
-  );
-};
+/* ------------------------------------------------------------------ chat */
+const Chat: React.FC = () => (
+  <>
+    <Beats
+      items={[
+        {
+          at: 0,
+          node: (
+            <>
+              <Marked size={76}>OPEN WEBUI</Marked>
+              <Sub>one chat page for all of it</Sub>
+            </>
+          ),
+          x: L,
+          y: 150,
+        },
+      ]}
+    />
+    <Centre bottom={150}>
+      <ShotIn delay={34}>
+        <Shot id="topology" width={930} showLabel={false} />
+      </ShotIn>
+    </Centre>
+  </>
+);
 
 /* ------------------------------------------------------------------- cta */
 const Cta: React.FC = () => {
   const frame = useCurrentFrame();
   const blink = Math.floor(frame / 10) % 2 === 0;
+  const typed = 'ai-local'.slice(0, Math.max(0, Math.floor((frame - 52) / 3)));
   return (
-    <DesignFrame>
-      <CutFlash />
-      <div style={{position: 'absolute', left: 0, right: 0, top: 230, textAlign: 'center'}}>
-        <Rise delay={2} y={30}>
-          <Outline size={92}>WANT THE</Outline>
+    <AbsoluteFill style={{alignItems: 'center', justifyContent: 'center'}}>
+      <div style={{textAlign: 'center', paddingBottom: 60}}>
+        <Rise delay={0} y={32}>
+          <Outline size={94}>WANT THE</Outline>
         </Rise>
-        <Rise delay={10} y={30}>
-          <div style={{marginTop: 8}}>
-            <Fill size={92}>SCRIPTS?</Fill>
+        <Rise delay={9} y={32}>
+          <div>
+            <Fill size={94}>SCRIPTS?</Fill>
           </div>
         </Rise>
-        <div style={{marginTop: 44}}>
+        <div style={{marginTop: 40}}>
           <Wipe delay={26}>
-            <Marked size={56}>TELL ME IN THE COMMENTS</Marked>
+            <Marked size={50}>COMMENT BELOW</Marked>
           </Wipe>
         </div>
         <Rise delay={46}>
           <div
             style={{
-              marginTop: 46,
+              marginTop: 44,
               display: 'inline-block',
-              padding: '16px 26px',
-              borderRadius: '18px 18px 18px 5px',
-              border: `1.6px solid ${VIOLET}`,
-              background: 'rgba(10,8,22,.85)',
+              padding: '18px 30px',
+              borderRadius: '20px 20px 20px 6px',
+              border: `1.8px solid ${VIOLET}`,
+              background: 'rgba(10,8,22,.88)',
               fontFamily: MONO,
-              fontSize: 30,
+              fontSize: 44,
+              fontWeight: 700,
               color: INK,
+              letterSpacing: 1,
             }}
           >
-            send me the setup{blink ? <span style={{color: VIOLET}}>▌</span> : <span>&nbsp;</span>}
+            {typed}
+            {blink ? <span style={{color: VIOLET}}>▌</span> : <span>&nbsp;</span>}
           </div>
         </Rise>
       </div>
-    </DesignFrame>
+    </AbsoluteFill>
   );
 };
 
 export const SCENES_BY_ID: Record<SceneId, React.FC> = {
   hook: Hook,
-  flow: FlowScene,
-  install: Install,
-  keys: Keys,
+  nogpu: NoGpu,
+  still: Still,
+  three: Three,
   local: Local,
+  tiers: Tiers,
   gpu: Gpu,
-  order: Order,
-  proof: Proof,
+  route: Route,
+  chat: Chat,
   cta: Cta,
 };
