@@ -4,6 +4,8 @@ import {
   BG, CORAL, FPS, Face, Gpu, Laptop, MINT, SKY, SUN, Shadow, Star, Title,
   blinking, bob, bounce, exit, squash,
 } from './kit';
+import {Narration} from './Narration';
+import WORDS from './words.json';
 
 /** Scene lengths in frames: voice delay + clip + a beat. */
 export const SCENES = [
@@ -20,7 +22,7 @@ const Hook: React.FC<{dur: number}> = ({dur}) => {
   const {sx, sy} = squash(rise);
   const light = interpolate(f, [16, 26], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   const face = bounce(f, 24, 220, 10);
-  const y = 720 + (1 - rise) * 900 + (f > 30 ? bob(f, 7) : 0);
+  const y = 640 + (1 - rise) * 900 + (f > 30 ? bob(f, 7) : 0);
   const stars = [
     {x: 170, y: 640, r: 32, c: SUN, d: 30},
     {x: 920, y: 580, r: 24, c: SKY, d: 36},
@@ -51,6 +53,7 @@ const Hook: React.FC<{dur: number}> = ({dur}) => {
         </g>
       </svg>
       <Title frame={f} text="YOUR OWN AI" sub="on the laptop you already have" delay={2} out={out} />
+      <Narration id="hook" delay={VO_DELAY} />
     </AbsoluteFill>
   );
 };
@@ -61,7 +64,7 @@ const NoGpu: React.FC<{dur: number}> = ({dur}) => {
   const out = exit(f, dur);
   const lap = bounce(f, 2, 170, 11);
   const gpu = bounce(f, 14, 180, 9);
-  const STAMP = 78; // "No big GPU" in the voice
+  const STAMP = VO_DELAY + Math.round(WORDS.nogpu.find((w) => w.w === 'No')!.s * FPS); // on the word "No"
   const stamp = bounce(f, STAMP, 260, 13);
   const hit = f >= STAMP + 4;
   const shake = hit ? Math.sin((f - STAMP) * 2.2) * 22 * Math.max(0, 1 - (f - STAMP) / 18) : 0;
@@ -71,24 +74,25 @@ const NoGpu: React.FC<{dur: number}> = ({dur}) => {
   return (
     <AbsoluteFill>
       <svg width={1080} height={1920}>
-        <g transform={`translate(540, ${560 + (1 - lap) * -300 + bob(f, 5)}) scale(${Math.max(0, lap) * out})`}>
+        <g transform={`translate(540, ${500 + (1 - lap) * -300 + bob(f, 5)}) scale(${0.85 * Math.max(0, lap) * out})`}>
           <Shadow y={350} w={700} />
           <Laptop>
             <Face x={0} y={160} s={1.4} blink={blinking(f, [50])} mood={hit ? 'wow' : 'happy'} look={lookDown} />
           </Laptop>
         </g>
-        <g transform={`translate(${540 + shake}, 1250) scale(${2 * out}) scale(${g.sx}, ${g.sy}) translate(-120, -110)`}
+        <g transform={`translate(${540 + shake}, 1110) scale(${1.8 * out}) scale(${g.sx}, ${g.sy}) translate(-120, -110)`}
           style={{filter: `grayscale(${1 - grey})`}} opacity={grey}>
           <Gpu spin={hit ? 0 : f * 9} mood={hit ? 'sad' : 'happy'} />
         </g>
         {f >= STAMP ? (
-          <g transform={`translate(540, 1250) scale(${(2.4 - 1.4 * Math.min(stamp, 1.2)) * out})`} opacity={Math.min(1, stamp * 2)}>
+          <g transform={`translate(540, 1110) scale(${0.9 * (2.4 - 1.4 * Math.min(stamp, 1.2)) * out})`} opacity={Math.min(1, stamp * 2)}>
             <circle cx={0} cy={0} r={230} fill="none" stroke={CORAL} strokeWidth={26} />
             <line x1={-162} y1={-162} x2={162} y2={162} stroke={CORAL} strokeWidth={26} strokeLinecap="round" />
           </g>
         ) : null}
       </svg>
       <Title frame={f} text="NO BIG GPU?" sub="most laptops don't have one" delay={2} out={out} />
+      <Narration id="nogpu" delay={VO_DELAY} />
     </AbsoluteFill>
   );
 };
