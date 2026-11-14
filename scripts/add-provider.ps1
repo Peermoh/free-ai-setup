@@ -186,10 +186,10 @@ $menu = @(
        Limits = 'Free models end in :free - 20 per minute, 50 per day for ALL OpenRouter models together';
        Data = 'Depends on who hosts each model; about half of the free models may train on prompts';
        Mind = 'Pick only :free models to stay free. Free models can disappear without notice.' },
-    @{ Id = 'mistral';    Name = 'Mistral';        Cost = 'PAID';        Key = '';          Where = 'console.mistral.ai > API Keys';
-       Limits = 'Keys stay inactive on the free plan; a paid plan is needed for API access';
-       Data = 'Check the terms of the plan you choose';
-       Mind = 'Free alternative: pick NVIDIA NIM and choose its mistralai/ models.' },
+    @{ Id = 'mistral';    Name = 'Mistral';        Cost = 'CHECK';       Key = '';          Where = 'console.mistral.ai > API Keys';
+       Limits = 'A free Experiment tier exists and is rate limited, but it needs phone verification and keys can stay inactive until that is done';
+       Data = 'The free Experiment tier requires opting in to training, so prompts may be used to improve Mistral models';
+       Mind = 'Check the current terms in the console before you rely on it. Free alternative: pick NVIDIA NIM and choose its mistralai/ models.' },
     @{ Id = 'cerebras';   Name = 'Cerebras';       Cost = 'CREDITS';     Key = 'csk-...';   Where = 'cloud.cerebras.ai';
        Limits = 'Starter credits rather than a standing free tier';
        Data = 'States it does not train on API data';
@@ -229,6 +229,9 @@ Say "  Your data   : $($p.Data)"
 Say "  Keep in mind: $($p.Mind)" Yellow
 if ($p.Cost -eq 'PAID') {
     if ((Read-Host '  This provider needs a paid plan. Continue anyway? (y/N)') -notmatch '^[yY]') { Say 'Nothing changed.'; return }
+}
+elseif ($p.Cost -eq 'CHECK') {
+    if ((Read-Host '  Check this provider''s current terms and costs before you rely on it. Continue? (y/N)') -notmatch '^[yY]') { Say 'Nothing changed.'; return }
 }
 
 # --- 2. Connect it ------------------------------------------------------------------------------

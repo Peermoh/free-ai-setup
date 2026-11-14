@@ -22,7 +22,7 @@ Get-ChildItem *.ps1 | Unblock-File
 | Path | What it does |
 | --- | --- |
 | `scripts/setup-ai.ps1` | Install everything (`-Install`), then configure it (`-Configure`) |
-| `scripts/add-provider.ps1` | Add a provider: shows FREE / TRIAL / PAID, limits and data use, then lets you pick models |
+| `scripts/add-provider.ps1` | Add a provider: shows its tier (FREE, FREE TRIAL, FREE + PAID, CREDITS, PAID or CHECK), its limits and how it uses your data, then lets you pick models |
 | `scripts/ai-sync.ps1` | Applies your list of models and combos; switches optional features on or off |
 | `scripts/omniroute-test.ps1` | Tests every model and simulates outages to prove fallback works |
 | `scripts/start-ai.bat` | One-click daily start |
