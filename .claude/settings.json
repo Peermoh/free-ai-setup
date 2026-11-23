@@ -86,7 +86,9 @@
     "threejs-webgl@claude-design-skillstack": true,
     "react-three-fiber@claude-design-skillstack": true,
     "gsap-scrolltrigger@claude-design-skillstack": true,
-    "video-shotcraft@synced": true
+    "video-shotcraft@synced": true,
+    "audit-suite@orbit-plugin": true,
+    "audit-suite@synced": false
   },
   "extraKnownMarketplaces": {
     "remotion": {
@@ -112,6 +114,13 @@
         "source": "github",
         "repo": "freshtechbro/claudedesignskills",
         "ref": "1da73febff0c3e1dfefc07f8a5ef8f7d1dfdb6cd"
+      }
+    },
+    "orbit-plugin": {
+      "source": {
+        "source": "github",
+        "repo": "recusive/orbit-plugin",
+        "ref": "db14d72bd58141f66157691ca5c69662123c51d6"
       }
     }
   }
