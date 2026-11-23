@@ -82,7 +82,11 @@
     "sales@synced": false,
     "small-business@synced": false,
     "typescript-lsp@claude-plugins-official": true,
-    "plugin-dev@claude-plugins-official": true
+    "plugin-dev@claude-plugins-official": true,
+    "threejs-webgl@claude-design-skillstack": true,
+    "react-three-fiber@claude-design-skillstack": true,
+    "gsap-scrolltrigger@claude-design-skillstack": true,
+    "video-shotcraft@synced": true
   },
   "extraKnownMarketplaces": {
     "remotion": {
@@ -101,6 +105,13 @@
       "source": {
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
+      }
+    },
+    "claude-design-skillstack": {
+      "source": {
+        "source": "github",
+        "repo": "freshtechbro/claudedesignskills",
+        "ref": "1da73febff0c3e1dfefc07f8a5ef8f7d1dfdb6cd"
       }
     }
   }
