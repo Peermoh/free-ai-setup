@@ -1,18 +1,4 @@
 {
-  "extraKnownMarketplaces": {
-    "remotion": {
-      "source": {
-        "source": "github",
-        "repo": "remotion-dev/claude-code-plugin"
-      }
-    },
-    "free-ai-setup": {
-      "source": {
-        "source": "github",
-        "repo": "Peermoh/free-ai-setup"
-      }
-    }
-  },
   "enabledPlugins": {
     "remotion@remotion": true,
     "threejs-video@free-ai-setup": true,
@@ -94,6 +80,28 @@
     "product-management@synced": false,
     "productivity@synced": false,
     "sales@synced": false,
-    "small-business@synced": false
+    "small-business@synced": false,
+    "typescript-lsp@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "remotion": {
+      "source": {
+        "source": "github",
+        "repo": "remotion-dev/claude-code-plugin"
+      }
+    },
+    "free-ai-setup": {
+      "source": {
+        "source": "github",
+        "repo": "Peermoh/free-ai-setup"
+      }
+    },
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
   }
 }
